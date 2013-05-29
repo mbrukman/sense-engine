@@ -28,15 +28,22 @@ module.exports = (dashboard) ->
   # for execution, returning any results to the dashboard, and notifying
   # the dashboard when the computation has stopped and the next command
   # can be sent in.
-  dashboard.execute = (code, next) -> 
+  dashboard.execute = (code, next) ->
+    # If the code is a comment, we report it to the dashboard without
+    # communicating with the child process at all. If the comments were
+    # known to be in markdown format, the comment character '#' could be
+    # stripped and the comment text could be passed to dashboard.markdown.
     if code[0] == 'comment'
       dashboard.comment(code[1])
-      dashboard.ready()
+      # The dashboard is now ready to take the next code chunk.
+      dashboard.prompt('coffee> ')
       next()
     else
       code = code[1]  
       dashboard.code(code, 'coffeescript')
       dashboard.worker.send code
+      # The next message we get from the dashboard will be the result of 
+      # executing the code.
       dashboard.worker.once 'message', (m) ->
         switch m.type
           when 'result'
@@ -47,7 +54,9 @@ module.exports = (dashboard) ->
             dashboard.widget m.value
           when 'html'
             dashboard.html m.value
-        dashboard.ready()
+        # Whether the code returned a result or caused an error, the dashboard
+        # is now ready to take the next code chunk.
+        dashboard.prompt('coffee> ')
         next()
 
   # A very simple chunker that splits code up into comments and actual code.
@@ -106,4 +115,6 @@ module.exports = (dashboard) ->
         chunks.push ['code', buffer.trim()]
     chunks
 
+  # We report that the dashboard is ready to start taking input.
+  dashboard.prompt('coffee> ')
   dashboard.ready()
