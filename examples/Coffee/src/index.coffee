@@ -1,19 +1,9 @@
-util = require('util')
-coffee = require 'coffee-script'
-_ = require('underscore')
+cp = require 'child_process'
+path = require 'path'
 
 module.exports = (dashboard) ->
   
-  stdoutOld = process.stdout.write.bind(process.stdout)
-  stderrOld = process.stderr.write.bind(process.stderr)
-  
-  process.stdout.write = (data) ->
-    dashboard.text(data)
-    stdoutOld(data)
-
-  process.stderr.write = (data) ->
-    dashboard.error(data)
-    stderrOld(data)
+  dashboard.worker = cp.fork path.join __dirname, 'child'
 
   dashboard.execute = (code, next) -> 
     if code[0] == 'comment'
@@ -21,26 +11,23 @@ module.exports = (dashboard) ->
     else
       code = code[1]  
       dashboard.code(code, 'coffeescript')
-      if code.trim().length > 0
-        try
-          result = coffee.eval "(#{code}\n)", {
-            filename: 'dashboard',
-            modulename: 'dashboard'
-          }
-          split = code.trim().split(/\s+/)
-          if result != undefined and not (split[1] in ["=", "+=", "-="])
-            if _.isFunction(result.toHtml)
-              dashboard.html(result.toHtml()) 
-            else if _.isFunction(result.toWidget)
-              # This should return a string that can be evaled.
-              dashboard.widget(result.toWidget())
-            else
-              dashboard.result(util.inspect(result))
-        catch error
-          dashboard.error({message: error.toString(), stack: error.stack})
-    next()
+      dashboard.worker.send code
+      dashboard.worker.once 'message', (m) ->
+        switch m.type
+          when 'result'
+            dashboard.text m.value
+          when 'error' 
+            dashboard.error m.value
+          when 'widget'
+            dashboard.widget m.value
+          when 'html'
+            dashboard.html m.value
+        dashboard.ready()
+        next()
 
-  # TODO: Better parser.
+
+  # A very simple chunker that splits code up into comments and actual code.
+  # It doesn't 
   dashboard.chunk = (code) ->
     chunks = []
     buffer = ""
@@ -48,7 +35,8 @@ module.exports = (dashboard) ->
     inBlockComment = false
     lastWasComment = false
     for line in lines
-      if line.slice(0,3) == "###"
+      trLine = line.trim()
+      if trLine.slice(0,3) == "###"
         if inBlockComment
           buffer += line
           chunks.push ['comment', buffer.trim()]
@@ -92,3 +80,5 @@ module.exports = (dashboard) ->
       else if buffer.trim() != ""
         chunks.push ['code', buffer.trim()]
     chunks
+
+  dashboard.ready()

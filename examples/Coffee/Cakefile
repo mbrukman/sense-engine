@@ -1,13 +1,12 @@
 shell = require 'shelljs'
-path = require 'path'
 
-task 'compile-sense', ->
-  console.log 'Compiling Sense files.'
-  #shell.exec 'sense --stdLib=false --sourceMap=true -c -o lib src'
+task 'compile-coffee', ->
+  console.log 'Compiling coffee files.'
   shell.exec 'coffee -c -o lib src'
   
 task 'build', ->
   shell.rm '-rf', 'lib'
   shell.mkdir 'lib'
-  invoke 'compile-sense'
+  invoke 'compile-coffee'
+  shell.cp 'src/child.coffee', 'lib'
   
