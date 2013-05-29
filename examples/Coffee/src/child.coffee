@@ -1,6 +1,7 @@
 coffee = require('coffee-script')
 util = require('util')
 _ = require('underscore')
+
 process.on 'message', (code) =>
   try
     result = coffee.eval("("+ code + "\n)", {
