@@ -2,11 +2,9 @@
   "name": "sense-coffee",
   "description": "Coffeescript dashboard for the Sense platform.",
   "version": "0.1.0",
-  "private": "true",
   "main": "./lib",
-  "license": "Copyright 2012, Sense Inc., All Rights Reserved",
+  "license": "MIT",
   "devDependencies": {
-		"sense": "*",
 		"shelljs": "~0.0.6pre2"
   },
   "dependencies": {

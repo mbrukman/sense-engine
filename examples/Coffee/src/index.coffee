@@ -1,7 +1,6 @@
 cp = require 'child_process'
 path = require 'path'
 _ = require 'underscore'
-bufferstream = require 'bufferstream'
 
 module.exports = (dashboard) ->
   
