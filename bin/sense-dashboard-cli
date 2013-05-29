@@ -1,0 +1,56 @@
+#!/usr/bin/env node 
+
+// Command line interface useful for debugging.
+
+var child_process = require('child_process')
+  , path = require('path')
+  , EventEmitter = require('events').EventEmitter
+  , readline = require('readline')
+  , argv = require('optimist').argv
+  , base = require('../lib/base');
+  
+var dashboard = new EventEmitter();
+var modulePath = path.join(process.cwd(), argv._[0]);
+var cp = child_process.fork(path.join(__dirname, '../lib/child'), [modulePath]);
+// Proxying through a child process is required for readline interface.
+cp.on('message', function (msg) {
+  switch (msg.event) {
+    case 'ready':
+      dashboard.emit('ready');
+      break;
+    case 'executing': 
+      dashboard.emit('executing');
+      break;
+    case 'output':
+      dashboard.emit('output', msg.data); 
+      break;
+  }
+});
+
+var rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+  completer: function() {return [];}
+})
+
+dashboard.on('ready', function() {
+  rl.question("> ", function (answer) {
+    cp.send({event: 'input', data: answer});
+  });
+});
+
+dashboard.on('output', function (data) {
+  console.log(data);
+});
+
+dashboard.on('executing', function () {
+  console.log('status: executing');
+});
+
+cp.send({event: 'start'});
+
+process.on('SIGINT', function() {});
+
+cp.on('exit', function() {
+  process.exit();
+});
