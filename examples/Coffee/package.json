@@ -15,5 +15,10 @@
   },
   "scripts": {
     "prepublish": "cake build"
+  },
+  "sense": {
+    "name": "Coffeescript",
+    "mode": "coffeescript",
+    "lineComment: '#'
   }
 }

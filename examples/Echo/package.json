@@ -6,5 +6,9 @@
   "license": "MIT",
   "dependencies": {
     "sense-dashboard": "~0.0.1"
+  },
+  "sense": {
+    "name": "Echo",
+    "mode": "text"
   }
 }
