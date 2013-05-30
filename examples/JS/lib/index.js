@@ -1,6 +1,72 @@
 var cp = require('child_process');
 var path = require('path');
 var _ = require('underscore');
+var marked = require('marked');
+
+chunkBlockComments = function(code) {
+  var chunks, comment, split, splits, _i, _len;
+  splits = code.split(/(\/\*|\*\/)/);
+  chunks = [];
+  comment = false;
+  for (_i = 0, _len = splits.length; _i < _len; _i++) {
+    split = splits[_i];
+    if (split === '/*') {
+      comment = true;
+    } else if (comment) {
+      if (split == '*/') {
+        comment = false;
+      }
+      else {
+        chunks.push(['blockComment', split]);
+      }
+    } else {
+      chunks.push(['unknown', split]);
+    }
+  }
+  return chunks;
+};
+
+chunkLineComments = function(code) {
+  var chunks, comment, curChunk, line, lines, trLine, _i, _len;
+  lines = code.split('\n');
+  chunks = [];
+  curChunk = "";
+  comment = false;
+  for (_i = 0, _len = lines.length; _i < _len; _i++) {
+    line = lines[_i];
+    trLine = line.trim();
+    if (trLine.slice(0,2) === '//') {
+      if (comment) {
+        curChunk += '\n' + line;
+      } else {
+        if (curChunk.length > 0) {
+          chunks.push(['code', curChunk.trim()]);
+        }
+        curChunk = line;
+        comment = true;
+      }
+    } else {
+      if (comment) {
+        if (curChunk.length > 0) {
+          chunks.push(['comment', curChunk]);
+        }
+        curChunk = line;
+        comment = false;
+      } else {
+        curChunk += '\n' + line;
+      }
+    }
+  }
+  if (curChunk.length > 0) {
+    if (comment) {
+      chunks.push(['comment', curChunk]);
+    } else {
+      chunks.push(['code', curChunk.trim()]);
+    }
+  }
+  return chunks;
+};
+
 
 module.exports = function(dashboard) {
   dashboard.worker = cp.fork(path.join(__dirname, 'child'), [], {
@@ -41,14 +107,18 @@ module.exports = function(dashboard) {
   dashboard.execute = function(code, next) {
     if (code[0] === 'comment') {
       // If the code is a comment, we report it to the dashboard without
-      // communicating with the child process at all. If the comments were
-      // known to be in markdown format, the comment character '#' could be
-      // stripped and the comment text could be passed to dashboard.markdown.
+      // communicating with the child process at all.
       dashboard.comment(code[1]);
       // The dashboard is now ready to take the next code chunk.
-      dashboard.ready();
       next();
-    } else {
+    } 
+    else if (code[0] == 'blockComment') {
+      // If the code is a block comment, we assume that it's Markdown
+      // documentation and pass it to the dashboard as such.
+      dashboard.markdown(marked(code[1]));
+      next();
+    }
+    else {
       code = code[1];
       dashboard.code(code, 'javascript');
       dashboard.worker.send(code);
@@ -72,7 +142,6 @@ module.exports = function(dashboard) {
         }
         // Whether the code returned a result or caused an error, the dashboard
         // is now ready to take the next code chunk.
-        dashboard.ready();
         next();
       });
     }
@@ -82,73 +151,18 @@ module.exports = function(dashboard) {
   // It doesn't split the code up into statements, which would make for nicer
   // looking dashboards.
   dashboard.chunk = function(code) {
-    return [['code', code]];
-    var buffer, chunks, inBlockComment, lastWasComment, line, lines, trLine, _i, _len;
-    chunks = [];
-    buffer = "";
-    lines = code.split("\n");
-    inBlockComment = false;
-    lastWasComment = false;
-    for (_i = 0, _len = lines.length; _i < _len; _i++) {
-      line = lines[_i];
-      trLine = line.trim();
-      if (trLine.slice(0, 3) === "*/") {
-        buffer += line;        
-        if (inBlockComment) {
-          chunks.push(['comment', buffer.trim()]);
-          buffer = "";
-          inBlockComment = false;
-        }
-      }
-      else {
-        if (buffer.trim() !== "") {
-          if (lastWasComment) {
-            chunks.push(['comment', buffer.trim()]);
-          } else {
-            chunks.push(['code', buffer.trim()]);
-          }
-          buffer = "";
-        }
-        buffer += line + "\n";
-        inBlockComment = true;
-      }
-      } else if (line[0] === "#" && !inBlockComment) {
-        if (!lastWasComment && buffer.trim() !== "") {
-          chunks.push(['code', buffer.trim()]);
-          buffer = "";
-        }
-        buffer += line + "\n";
-        lastWasComment = true;
+    var chunk, chunks, newChunks, _i, _len;
+    chunks = chunkBlockComments(code);
+    newChunks = [];
+    for (_i = 0, _len = chunks.length; _i < _len; _i++) {
+      chunk = chunks[_i];
+      if (chunk[0] === 'unknown') {
+        newChunks.push.apply(newChunks, chunkLineComments(chunk[1]));
       } else {
-        if (inBlockComment) {
-          buffer += line + "\n";
-          continue;
-        } else if (lastWasComment) {
-          chunks.push(['comment', buffer.trim()]);
-          buffer = "";
-          lastWasComment = false;
-        }
-        if (line.trim().length === 0 || line[0] === " " || (line.slice(0, 4) === "else" && line.trim().length === 4) || line.slice(0, 4) === "else ") {
-          buffer += line + "\n";
-        } else {
-          if (buffer.trim() !== "") {
-            chunks.push(['code', buffer.trim()]);
-            buffer = "";
-          }
-          buffer = line + "\n";
-        }
+        newChunks.push(chunk);
       }
     }
-    if (buffer) {
-      if (lastWasComment) {
-        chunks.push(['comment', buffer.trim()]);
-      } else if (inBlockComment) {
-        chunks.push(['comment', buffer.trim()]);
-      } else if (buffer.trim() !== "") {
-        chunks.push(['code', buffer.trim()]);
-      }
-    }
-    return chunks;
+    return newChunks;
   };
   return dashboard.ready();
 };

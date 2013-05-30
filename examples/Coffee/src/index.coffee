@@ -77,7 +77,8 @@ module.exports = (dashboard) ->
       # The dashboard is now ready to take the next code chunk.
       dashboard.prompt('coffee> ')
       next()
-    # If the code is a block comment, we assume that it's 
+    # If the code is a block comment, we assume that it's Markdown
+    # documentation and pass it to the dashboard as such.
     else if code[0] == 'blockComment'
       dashboard.markdown marked code[1]
       dashboard.prompt('coffee>')
@@ -114,7 +115,6 @@ module.exports = (dashboard) ->
         newChunks.push.apply newChunks, chunkLineComments chunk[1]
       else
         newChunks.push chunk
-    console.log JSON.stringify newChunks
     newChunks
 
   # We report that the dashboard is ready to start taking input.
