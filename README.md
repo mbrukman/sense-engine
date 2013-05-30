@@ -47,7 +47,7 @@ module.exports = function(dashboard) {
 
 The following output methods of the dashboard can be called at any time to handle output from the worker process. In particular, the execute function can output any result or error associated with a chunk of code. It can also output comment chunks as plain text, and markdown-formatted comments as html.
 
-```
+```javascript
 // Display the string as plain text output.
 dashboard.text(string)
 
