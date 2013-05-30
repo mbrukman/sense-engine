@@ -69,17 +69,31 @@ chunkLineComments = function(code) {
 
 
 module.exports = function(dashboard) {
-  dashboard.worker = cp.fork(path.join(__dirname, 'child'), [], {
+  worker = cp.fork(path.join(__dirname, 'child'), [], {
     silent: true
   });
+
+  // We report that the dashboard is ready to start taking input.
+  var readyListener;
+  worker.once('message', readyListener = function(m) {
+    if (m == 'ready') {
+      dashboard.ready();
+    }
+    else {
+      worker.once('message', readyListener);
+    }
+  });
+
+  worker.on('exit', process.exit);
+
 
   // We capture all output of the dashboard and report it as text. Note
   // that this will catch calls to console.log and such, not the results
   // of expressions that we evaluate.
-  dashboard.worker.stdout.on('data', function(data) {
+  worker.stdout.on('data', function(data) {
     return dashboard.text(data);
   });
-  dashboard.worker.stderr.on('data', function(data) {
+  worker.stderr.on('data', function(data) {
     return dashboard.text(data);
   });
 
@@ -97,7 +111,7 @@ module.exports = function(dashboard) {
   // This interrupt function just sends the SIGINT signal to the worker
   // process, but many other behaviors are possible.
   dashboard.interrupt = function() {
-    return dashboard.worker.kill('SIGINT');
+    return worker.kill('SIGINT');
   };
 
   // This function is responsible for sending code to the worker process
@@ -121,10 +135,10 @@ module.exports = function(dashboard) {
     else {
       code = code[1];
       dashboard.code(code, 'javascript');
-      dashboard.worker.send(code);
+      worker.send(code);
       // The next message we get from the dashboard will be the result of 
       // executing the code.
-      return dashboard.worker.once('message', function(m) {
+      return worker.once('message', function(m) {
         switch (m.type) {
           case 'result':
             if (m.value !== 'undefined') {
@@ -164,5 +178,4 @@ module.exports = function(dashboard) {
     }
     return newChunks;
   };
-  return dashboard.ready();
 };

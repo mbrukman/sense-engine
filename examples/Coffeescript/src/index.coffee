@@ -46,13 +46,22 @@ chunkLineComments = (code) ->
 
 module.exports = (dashboard) ->
   
-  dashboard.worker = cp.fork path.join(__dirname, 'child'), [], {silent: true}
+  worker = cp.fork path.join(__dirname, 'child'), [], {silent: true}
+  # We report that the dashboard is ready to start taking input.
+  worker.once 'message', readyListener = (m) ->
+    if m == 'ready'
+      dashboard.prompt('coffee> ')
+      dashboard.ready()
+    else
+      worker.once 'message', readyListener
 
   # We capture all output of the dashboard and report it as text. Note
   # that this will catch calls to console.log and such, not the results
   # of expressions that we evaluate.
-  dashboard.worker.stdout.on 'data', (data) -> dashboard.text data
-  dashboard.worker.stderr.on 'data', (data) -> dashboard.text data
+  worker.stdout.on 'data', (data) -> dashboard.text data
+  worker.stderr.on 'data', (data) -> dashboard.text data
+
+  worker.on 'exit', process.exit
   
   # A very simple autocomplete function that just matches against
   # the globals.
@@ -63,7 +72,7 @@ module.exports = (dashboard) ->
   # This interrupt function just sends the SIGINT signal to the worker
   # process, but many other behaviors are possible.
   dashboard.interrupt = ->
-    dashboard.worker.kill 'SIGINT'
+    worker.kill 'SIGINT'
 
   # This function is responsible for sending code to the worker process
   # for execution, returning any results to the dashboard, and notifying
@@ -85,22 +94,26 @@ module.exports = (dashboard) ->
       next()
     else
       code = code[1]  
-      dashboard.code(code, 'coffeescript')
-      dashboard.worker.send code
-      # The next message we get from the dashboard will be the result of 
-      # executing the code.
-      dashboard.worker.once 'message', (m) ->
-        switch m.type
-          when 'result'
-            if m.value != 'undefined' then dashboard.text m.value
-          when 'error' 
-            dashboard.error m.value
-          when 'widget'
-            dashboard.widget m.value
-          when 'html'
-            dashboard.html m.value
-        # Whether the code returned a result or caused an error, the dashboard
-        # is now ready to take the next code chunk.
+      if code.trim().length > 0
+        dashboard.code(code, 'coffeescript')
+        worker.send code
+        # The next message we get from the dashboard will be the result of 
+        # executing the code.
+        worker.once 'message', (m) ->
+          switch m.type
+            when 'result'
+              if m.value != 'undefined' then dashboard.text m.value
+            when 'error' 
+              dashboard.error m.value
+            when 'widget'
+              dashboard.widget m.value
+            when 'html'
+              dashboard.html m.value
+          # Whether the code returned a result or caused an error, the dashboard
+          # is now ready to take the next code chunk.
+          dashboard.prompt('coffee> ')
+          next()
+      else
         dashboard.prompt('coffee> ')
         next()
 
@@ -116,7 +129,3 @@ module.exports = (dashboard) ->
       else
         newChunks.push chunk
     newChunks
-
-  # We report that the dashboard is ready to start taking input.
-  dashboard.prompt('coffee> ')
-  dashboard.ready()

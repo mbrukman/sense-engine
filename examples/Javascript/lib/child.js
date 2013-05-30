@@ -30,3 +30,5 @@ process.on('message', function(code) {
     });
   }
 });
+
+process.send('ready')

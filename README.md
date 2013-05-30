@@ -13,14 +13,6 @@ Your dashboard module should export a function of a single argument. The argumen
 ```javascript
 module.exports = function(dashboard) {
 
-  dashboard.worker =  // A child process launched using Node's 
-                      // child_process.spawn, child_process.fork 
-                      // or some other way. All dashboards must
-                      // spawn a worker process so that the 
-                      // parent process stays free to listen to 
-                      // incoming events even when the worker is
-                      // doing something that takes a long time.
-
   dashboard.complete = function(codeString) {
     // Returns an array of completions for the argument.
   }
@@ -32,13 +24,14 @@ module.exports = function(dashboard) {
   }
 
   dashboard.interrupt = function() {
-    // Returns nothing, but interrupts the worker process somehow.
-    // This is often accomplished using dashboard.worker.kill 'SIGINT'.
+    // Returns nothing, but interrupts the dashboard somehow. This is 
+    // often accomplished by running the dashboard in a worker and using 
+    // worker.kill 'SIGINT'.
   }
 
   dashboard.execute = function(chunk, next) {
     // This function should send one chunk output by dashboard.chunk
-    // to the worker process for execution, and should call 'next' 
+    // to the dashboard's engine for execution, and should call 'next' 
     // once the execution is complete and any result has been passed 
     // to one of the output methods documented below. 'next' can be 
     // called from a callback if that is easier. This function can
@@ -48,7 +41,7 @@ module.exports = function(dashboard) {
 };
 ```
 
-The following output methods of the dashboard can be called at any time to handle output from the worker process. In particular, they allow the 'execute' function to output any result or error associated with a chunk of code.
+The following output methods of the dashboard can be called at any time to handle output from the dashboard. In particular, they allow the 'execute' function to output any result or error associated with a chunk of code.
 
 ```javascript
 // Display the string as plain text output.
@@ -107,7 +100,7 @@ If your dashboard fails to launch on Sense, we'll do our best to report the erro
 To do this, type 
 
 ```javascript
-require('sense-dashboard').cli(dashboardModule)
+require('sense-dashboard').cli(dashboardModule, [startupScript])
 ```
 
-into node.js. All the dashboards in the examples folder have executable command-line versions in their `bin` folders.
+into node.js. The option startupScript argument is the name of a file containing code. The dashboard will execute the file's contents before taking any more input. All the dashboards in the examples folder have executable command-line versions in their `bin` folders.

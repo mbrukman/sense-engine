@@ -20,3 +20,5 @@ process.on 'message', (code) =>
       process.send({type: 'result', value: util.inspect(result)})
   catch err
     process.send({type: 'error', value: err.stack.toString()})
+
+process.send 'ready'
