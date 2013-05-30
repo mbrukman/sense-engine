@@ -1,5 +1,0 @@
-shell = require 'shelljs'
-
-task 'build', ->
-  console.log 'Compiling Sense files.'
-  shell.exec 'sense --stdLib=false --sourceMap=true -c index.sense'

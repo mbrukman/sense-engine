@@ -1,14 +1,10 @@
 {
-  "name": "echo-dashboard",
-  "description": "Echo dashboard for the Sense platform.",
+  "name": "sense-echo",
+  "description": "Simple echo dashboard for the Sense platform.",
   "version": "0.1.0",
-  "private": "true",
-  "main": "index.js",
-  "url": "http://www.senseplatform.com/",
-  "license": "Copyright 2012, Sense Inc., All Rights Reserved",
-  "devDependencies": {
-		"sense": "*",
-		"coffee-script": "~1.3.3",
-		"shelljs": "~0.0.6pre2"
+  "main": "./lib",
+  "license": "MIT",
+  "dependencies": {
+    "sense-dashboard": "~0.0.1"
   }
 }
