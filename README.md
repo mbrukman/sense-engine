@@ -2,7 +2,7 @@
 
 This package gives you everything you need to run your favorite programming language or console-based application as a dashboard on the Sense Platform's cloud infrastructure, using the same user interface as the officially-supported dashboards. 
 
-User-defined dashboards are [npm | npmjs.org] modules that export a single function, which complies with the specification documented below. Their package.json files must have an entry called `sense`. There are three example dashboards to get you started in the examples folder.
+User-defined dashboards are [[npm|npmjs.org]] modules that export a single function, which complies with the specification documented below. Their package.json files must have an entry called `sense`. There are three example dashboards to get you started in the examples folder.
 
 To deploy a custom dashboard, simply stick it in `/home/sense/node_modules` in one of your projects. When you launch dashboards from that project in the future, the new dashboard type will be available in the drop-down menu.
 
