@@ -95,12 +95,14 @@ The `sense` entry signals that your dashboard is in fact a dashboard, tells the 
 
 ### Testing from the command line
 
-If your dashboard fails to launch on Sense, we'll do our best to report the error to you; but it's much easier to run your dashboard from a local command line while developing and testing it, and then deploy to Sense after you're pretty sure it works.
+If your dashboard fails to launch on Sense, we'll do our best to report the error to you; but it's much easier to run your dashboard in a command line-based repl while developing and testing it, and then deploy to Sense after you're pretty sure it works.
 
 To do this, type 
 
 ```javascript
-require('sense-dashboard').cli(dashboardModule, [startupScript])
+require('sense-dashboard').repl(dashboardModule, [startupScript])
 ```
 
 into node.js. The option startupScript argument is the name of a file containing code. The dashboard will execute the file's contents before taking any more input. All the dashboards in the examples folder have executable command-line versions in their `bin` folders.
+
+In the repl, you can switch into multiline mode by pressing ctrl-v. In multiline mode, the repl will accumulate the code you type or paste in until it sees a blank line.
