@@ -42,6 +42,8 @@ exports.createDashboard = function(dashboard) {
 };
 ```
 
+It is important that none of these functions runs for a long time so that node.js is free to listen for incoming events. The execute function, in particular, should usually delegate to a separate thread or process.
+
 The following output methods of the dashboard can be called at any time to handle output from the dashboard. In particular, they allow the 'execute' function to output any result or error associated with a chunk of code.
 
 ```javascript
