@@ -44,7 +44,7 @@ chunkLineComments = (code) ->
       chunks.push ['code', curChunk.trim()]
   chunks
 
-module.exports = (dashboard) ->
+exports.createDashboard = (dashboard) ->
   
   worker = cp.fork path.join(__dirname, 'child'), [], {silent: true}
   # We report that the dashboard is ready to start taking input.
@@ -65,9 +65,9 @@ module.exports = (dashboard) ->
   
   # A very simple autocomplete function that just matches against
   # the globals.
-  dashboard.complete = (substr) ->
+  dashboard.complete = (substr, cb) ->
     names = Object.getOwnPropertyNames global
-    _.filter names, (x) => x.indexOf(substr) == 0
+    cb _.filter names, (x) => x.indexOf(substr) == 0
 
   # This interrupt function just sends the SIGINT signal to the worker
   # process, but many other behaviors are possible.
@@ -120,7 +120,7 @@ module.exports = (dashboard) ->
   # A very simple chunker that splits code up into comments and actual code.
   # It doesn't split the code up into statements, which would make for nicer
   # looking dashboards.
-  dashboard.chunk = (code) ->
+  dashboard.chunk = (code, cb) ->
     chunks = chunkBlockComments code
     newChunks = []
     for chunk in chunks
@@ -128,4 +128,4 @@ module.exports = (dashboard) ->
         newChunks.push.apply newChunks, chunkLineComments chunk[1]
       else
         newChunks.push chunk
-    newChunks
+    cb(newChunks)

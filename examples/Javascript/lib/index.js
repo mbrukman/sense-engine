@@ -68,7 +68,7 @@ chunkLineComments = function(code) {
 };
 
 
-module.exports = function(dashboard) {
+exports.createDashboard = function(dashboard) {
   worker = cp.fork(path.join(__dirname, 'child'), [], {
     silent: true
   });
@@ -99,13 +99,13 @@ module.exports = function(dashboard) {
 
   // A very simple autocomplete function that just matches against
   // the globals.
-  dashboard.complete = function(substr) {
+  dashboard.complete = function(substr, cb) {
     var names,
       _this = this;
     names = Object.getOwnPropertyNames(global);
-    return _.filter(names, function(x) {
+    cb(_.filter(names, function(x) {
       return x.indexOf(substr) === 0;
-    });
+    }));
   };
 
   // This interrupt function just sends the SIGINT signal to the worker
@@ -164,7 +164,7 @@ module.exports = function(dashboard) {
   // A very simple chunker that splits code up into comments and actual code.
   // It doesn't split the code up into statements, which would make for nicer
   // looking dashboards.
-  dashboard.chunk = function(code) {
+  dashboard.chunk = function(code, cb) {
     var chunk, chunks, newChunks, _i, _len;
     chunks = chunkBlockComments(code);
     newChunks = [];
@@ -176,6 +176,6 @@ module.exports = function(dashboard) {
         newChunks.push(chunk);
       }
     }
-    return newChunks;
+    cb(newChunks);
   };
 };

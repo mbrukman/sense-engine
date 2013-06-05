@@ -1,12 +1,12 @@
 var cp = require('child_process');
 var path = require('path');
 
-module.exports = function(dashboard) {
+exports.createDashboard = function(dashboard) {
 
   // The echo dashboard's autocomplete function can't really do anything
   // useful, so we just give back the input as the sole completion.
-  dashboard.complete = function(substr) {
-    return [substr];
+  dashboard.complete = function(substr, cb) {
+    cb([substr]);
   };
 
   // This interrupt function just prints a message and then exits.
@@ -24,8 +24,8 @@ module.exports = function(dashboard) {
   };
 
   // This extremely simple chunker just splits the input up into lines.
-  dashboard.chunk = function(code) {
-    return code.split('\n');
+  dashboard.chunk = function(code, cb) {
+    cb(code.split('\n'));
   };
 
   dashboard.ready();
