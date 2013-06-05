@@ -8,19 +8,20 @@ To deploy a custom dashboard, simply stick it in `/home/sense/node_modules` in o
 
 ### The exported function
 
-Your dashboard module should export a function of a single argument. The argument will be a dashboard instance, and the function should add the following attributes to it:
+Your dashboard module should export a function of a single argument called `createDashboard`. The argument will be a dashboard instance, and the function should add the following attributes to it:
 
 ```javascript
-module.exports = function(dashboard) {
+exports.createDashboard = function(dashboard) {
 
-  dashboard.complete = function(codeString) {
-    // Returns an array of completions for the argument.
+  dashboard.complete = function(codeString, cb) {
+    // Passes an array of completions to the callback.
   }
 
-  dashboard.chunk = function(codeString) {
+  dashboard.chunk = function(codeString, cb) {
     // Splits the code up into chunks, which may be statements, 
-    // comments, etc. and returns them in an array. These chunks
-    // will be sent to dashboard.execute one at a time.
+    // comments, etc. puts them in an array, and passes them to 
+    // the callback. These chunks will be sent to dashboard.execute 
+    // one at a time.
   }
 
   dashboard.interrupt = function() {
