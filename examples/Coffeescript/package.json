@@ -18,7 +18,6 @@
   },
   "sense": {
     "name": "Coffeescript",
-    "mode": "coffeescript",
-    "lineComment: '#'
+    "mode": "coffeescript"
   }
 }
