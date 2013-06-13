@@ -2,50 +2,26 @@ cp = require 'child_process'
 path = require 'path'
 _ = require 'underscore'
 marked = require 'marked'
+coffee = require 'coffee-script'
+cch = require 'comment-chunk-helper'
 
-chunkBlockComments = (code) ->
-  splits = code.split /(###)/
-  chunks = []
-  comment = false
-  for split in splits
-    if split == '###'
-      comment = not comment
-    else if comment
-      chunks.push ['blockComment', split]
-    else
-      chunks.push ['unknown', split]
-  chunks
+parse = (code, cb) =>
+  try 
+    statements = coffee.nodes(code).expressions
+    statLocs = []
+    for stat in statements
+      l = stat.locationData
+      statLocs.push {start: {line: l.first_line, column: l.first_column}, end: {line: l.last_line+1, column: l.last_column+1}}
+    cb false, {statements: statLocs}
+  catch e
+    cb false, {error: e.message}
 
-chunkLineComments = (code) ->
-  lines = code.split '\n'
-  chunks = []
-  curChunk = ""
-  comment = false
-  for line in lines
-    trLine = line.trim()
-    if trLine[0] == '#'
-      if comment
-        curChunk += '\n' + line
-      else
-        if curChunk.length > 0 then chunks.push ['code', curChunk.trim()]
-        curChunk = line
-        comment = true
-    else
-      if comment
-        if curChunk.length > 0 then chunks.push ['comment', curChunk]
-        curChunk = line
-        comment = false
-      else
-        curChunk += '\n' + line
-  if curChunk.length > 0
-    if comment
-      chunks.push ['comment', curChunk]
-    else
-      chunks.push ['code', curChunk.trim()]
-  chunks
+chunk = cch
+  parser: parse
+  lineComment: "#"
+  blockComment: {left: "###", right: "###"}
 
-exports.createDashboard = (dashboard) ->
-  
+exports.createDashboard = (dashboard) ->  
   worker = cp.fork path.join(__dirname, 'child'), [], {silent: true}
   # We report that the dashboard is ready to start taking input.
   worker.once 'message', readyListener = (m) ->
@@ -78,22 +54,22 @@ exports.createDashboard = (dashboard) ->
   # for execution, returning any results to the dashboard, and notifying
   # the dashboard when the computation has stopped and the next command
   # can be sent in.
-  dashboard.execute = (code, next) ->
-    # If the code is a comment, we report it to the dashboard without
+  dashboard.execute = (chunk, next) ->
+    # If the chunk is a comment, we report it to the dashboard without
     # communicating with the child process at all.
-    if code[0] == 'comment'
-      dashboard.comment(code[1])
+    if chunk.type == 'comment'
+      dashboard.comment(chunk.value)
       # The dashboard is now ready to take the next code chunk.
       dashboard.prompt('coffee> ')
       next()
-    # If the code is a block comment, we assume that it's Markdown
+    # If the chunk is a block comment, we assume that it's Markdown
     # documentation and pass it to the dashboard as such.
-    else if code[0] == 'blockComment'
-      dashboard.markdown marked code[1]
+    else if chunk.type == 'blockComment'
+      dashboard.markdown marked chunk.value
       dashboard.prompt('coffee>')
       next()
     else
-      code = code[1]  
+      code = chunk.value
       if code.trim().length > 0
         dashboard.code(code, 'coffeescript')
         worker.send code
@@ -117,15 +93,4 @@ exports.createDashboard = (dashboard) ->
         dashboard.prompt('coffee> ')
         next()
 
-  # A very simple chunker that splits code up into comments and actual code.
-  # It doesn't split the code up into statements, which would make for nicer
-  # looking dashboards.
-  dashboard.chunk = (code, cb) ->
-    chunks = chunkBlockComments code
-    newChunks = []
-    for chunk in chunks
-      if chunk[0] == 'unknown'
-        newChunks.push.apply newChunks, chunkLineComments chunk[1]
-      else
-        newChunks.push chunk
-    cb(newChunks)
+  dashboard.chunk = chunk
