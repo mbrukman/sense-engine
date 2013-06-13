@@ -7,14 +7,17 @@ cch = require 'comment-chunk-helper'
 
 parse = (code, cb) =>
   try 
-    statements = coffee.nodes(code).expressions
+    # Coffeescript produces AST nodes for block comments, which we 
+    # don't want because they'll be handled by the comment chunk
+    # helper.
+    statements = _.filter coffee.nodes(code).expressions, ((expr) => !expr.comment)
     statLocs = []
     for stat in statements
       l = stat.locationData
       statLocs.push {start: {line: l.first_line, column: l.first_column}, end: {line: l.last_line+1, column: l.last_column+1}}
     cb false, {statements: statLocs}
   catch e
-    cb false, {error: e.message}
+    cb false, {error: e.stack.toString()}
 
 chunk = cch
   parser: parse
@@ -55,7 +58,6 @@ exports.createDashboard = (dashboard) ->
   # the dashboard when the computation has stopped and the next command
   # can be sent in.
   dashboard.execute = (chunk, next) ->
-    console.log "HI", chunk
     # If the chunk is a comment, we report it to the dashboard without
     # communicating with the child process at all.
     if chunk.type == 'comment'
