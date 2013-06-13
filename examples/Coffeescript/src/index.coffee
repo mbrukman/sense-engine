@@ -7,17 +7,17 @@ cch = require 'comment-chunk-helper'
 
 parse = (code, cb) =>
   try 
-    # Coffeescript produces AST nodes for block comments, which we 
-    # don't want because they'll be handled by the comment chunk
-    # helper.
-    statements = _.filter coffee.nodes(code).expressions, ((expr) => !expr.comment)
+    # We leave the block comments to be handled by comment-chunk-helper, although
+    # Coffeescript does generate AST nodes for them.
+    statements = _.filter coffee.nodes(code).expressions, (expr) => not expr.comment
     statLocs = []
     for stat in statements
       l = stat.locationData
       statLocs.push {start: {line: l.first_line, column: l.first_column}, end: {line: l.last_line+1, column: l.last_column+1}}
-    cb false, {statements: statLocs}
+    cb false, statLocs
   catch e
-    cb false, {error: e.stack.toString()}
+    # TODO: Get line and column in error message and cut the unnecessary stack elements.
+    cb e.stack.toString()
 
 chunk = cch
   parser: parse

@@ -2,70 +2,54 @@ var cp = require('child_process');
 var path = require('path');
 var _ = require('underscore');
 var marked = require('marked');
+var esprima = require('esprima');
+var cch = require('comment-chunk-helper');
 
-chunkBlockComments = function(code) {
-  var chunks, comment, split, splits, _i, _len;
-  splits = code.split(/(\/\*|\*\/)/);
-  chunks = [];
-  comment = false;
-  for (_i = 0, _len = splits.length; _i < _len; _i++) {
-    split = splits[_i];
-    if (split === '/*') {
-      comment = true;
-    } else if (comment) {
-      if (split == '*/') {
-        comment = false;
+var formatEsprimaError = function(e) {
+  return "SyntaxError: " + e.message.replace(/^Line (\d+): /, "") + "\n    at dashboard:" + e.lineNumber + ":" + e.column;
+}
+
+var getEsprimaLocs = function(ast) {
+  var statLocs = [];
+  for (var i=0; i<ast.body.length;i++) {
+    var stat = ast.body[i];
+    statLocs.push({
+      start: {
+        line: stat.loc.start.line - 1, // esprima indexes lines starting at 1
+        column: stat.loc.start.column        // but columns starting at 0
+      },
+      end: {
+        line: stat.loc.end.line,           // esprima's upper bound line is inclusive, 
+                                       // but indexed starting at 1
+        column: stat.loc.end.column        // its upper bound column is exclusive
       }
-      else {
-        chunks.push(['blockComment', split]);
-      }
-    } else {
-      chunks.push(['unknown', split]);
-    }
+    });
   }
-  return chunks;
+  return statLocs;
+}
+
+
+var parse = function(code, cb) {
+  try {
+    // Esprima has the ability to parse comments, but we may as well let 
+    // comment-chunk-helper do it, as it will intersperse them correctly
+    // with code and output.
+    var ast = esprima.parse(code, {loc: true});
+    cb(false, getEsprimaLocs(ast));    
+  }
+  catch (e) {
+    cb(formatEsprimaError(e));
+  }
 };
 
-chunkLineComments = function(code) {
-  var chunks, comment, curChunk, line, lines, trLine, _i, _len;
-  lines = code.split('\n');
-  chunks = [];
-  curChunk = "";
-  comment = false;
-  for (_i = 0, _len = lines.length; _i < _len; _i++) {
-    line = lines[_i];
-    trLine = line.trim();
-    if (trLine.slice(0,2) === '//') {
-      if (comment) {
-        curChunk += '\n' + line;
-      } else {
-        if (curChunk.length > 0) {
-          chunks.push(['code', curChunk.trim()]);
-        }
-        curChunk = line;
-        comment = true;
-      }
-    } else {
-      if (comment) {
-        if (curChunk.length > 0) {
-          chunks.push(['comment', curChunk]);
-        }
-        curChunk = line;
-        comment = false;
-      } else {
-        curChunk += '\n' + line;
-      }
-    }
+var chunk = cch({
+  parser: parse,
+  lineComment: "//",
+  blockComment: {
+    left: "/*",
+    right: "*/"
   }
-  if (curChunk.length > 0) {
-    if (comment) {
-      chunks.push(['comment', curChunk]);
-    } else {
-      chunks.push(['code', curChunk.trim()]);
-    }
-  }
-  return chunks;
-};
+});
 
 
 exports.createDashboard = function(dashboard) {
@@ -97,6 +81,8 @@ exports.createDashboard = function(dashboard) {
     return dashboard.text(data);
   });
 
+  dashboard.chunk = chunk;
+
   // A very simple autocomplete function that just matches against
   // the globals.
   dashboard.complete = function(substr, cb) {
@@ -118,22 +104,27 @@ exports.createDashboard = function(dashboard) {
   // for execution, returning any results to the dashboard, and notifying
   // the dashboard when the computation has stopped and the next command
   // can be sent in.
-  dashboard.execute = function(code, next) {
-    if (code[0] === 'comment') {
-      // If the code is a comment, we report it to the dashboard without
+  dashboard.execute = function(chunk, next) {
+    if (chunk.type === 'comment') {
+      // If the chunk is a comment, we report it to the dashboard without
       // communicating with the child process at all.
-      dashboard.comment(code[1]);
-      // The dashboard is now ready to take the next code chunk.
+      dashboard.comment(chunk.value);
+      // The dashboard is now ready to take the next chunk.
       next();
     } 
-    else if (code[0] == 'blockComment') {
-      // If the code is a block comment, we assume that it's Markdown
+    else if (chunk.type === 'blockComment') {
+      // If the chunk is a block comment, we assume that it's Markdown
       // documentation and pass it to the dashboard as such.
-      dashboard.markdown(marked(code[1]));
+      dashboard.markdown(marked(chunk.value));
+      next();
+    }
+    else if (chunk.type === 'error') {
+      // If the chunk is a syntax error, we pass it right to the dashboard.
+      dashboard.error(chunk.value);
       next();
     }
     else {
-      code = code[1];
+      var code = chunk.value;
       dashboard.code(code, 'javascript');
       worker.send(code);
       // The next message we get from the dashboard will be the result of 
@@ -161,21 +152,4 @@ exports.createDashboard = function(dashboard) {
     }
   };
 
-  // A very simple chunker that splits code up into comments and actual code.
-  // It doesn't split the code up into statements, which would make for nicer
-  // looking dashboards.
-  dashboard.chunk = function(code, cb) {
-    var chunk, chunks, newChunks, _i, _len;
-    chunks = chunkBlockComments(code);
-    newChunks = [];
-    for (_i = 0, _len = chunks.length; _i < _len; _i++) {
-      chunk = chunks[_i];
-      if (chunk[0] === 'unknown') {
-        newChunks.push.apply(newChunks, chunkLineComments(chunk[1]));
-      } else {
-        newChunks.push(chunk);
-      }
-    }
-    cb(newChunks);
-  };
 };
