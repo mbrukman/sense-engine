@@ -55,6 +55,7 @@ exports.createDashboard = (dashboard) ->
   # the dashboard when the computation has stopped and the next command
   # can be sent in.
   dashboard.execute = (chunk, next) ->
+    console.log "HI", chunk
     # If the chunk is a comment, we report it to the dashboard without
     # communicating with the child process at all.
     if chunk.type == 'comment'
@@ -66,6 +67,10 @@ exports.createDashboard = (dashboard) ->
     # documentation and pass it to the dashboard as such.
     else if chunk.type == 'blockComment'
       dashboard.markdown marked chunk.value
+      dashboard.prompt('coffee>')
+      next()
+    else if chunk.type == 'error'
+      dashboard.error(chunk.value)
       dashboard.prompt('coffee>')
       next()
     else
