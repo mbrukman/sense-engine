@@ -16,8 +16,7 @@ parse = (code, cb) =>
       statLocs.push {start: {line: l.first_line, column: l.first_column}, end: {line: l.last_line+1, column: l.last_column+1}}
     cb false, statLocs
   catch e
-    # TODO: Get line and column in error message and cut the unnecessary stack elements.
-    cb e.stack.toString()
+    cb coffee.helpers.prettyErrorMessage e, "repl", code, false
 
 chunk = cch
   parser: parse
