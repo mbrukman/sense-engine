@@ -16,7 +16,7 @@ parse = (code, cb) =>
       statLocs.push {start: {line: l.first_line, column: l.first_column}, end: {line: l.last_line+1, column: l.last_column+1}}
     cb false, statLocs
   catch e
-    cb coffee.helpers.prettyErrorMessage e, "repl", code, false
+    cb coffee.helpers.prettyErrorMessage e, "dashboard", code, false
 
 chunk = cch
   parser: parse
