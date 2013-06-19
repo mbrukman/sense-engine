@@ -1,10 +1,11 @@
 var util = require('util');
 var _ = require('underscore');
+var vm = require('vm');
 
 process.on('message', function(code) {
   var result, split;
   try {
-    result = eval(code, global, 'dashboard');
+    result = vm.runInThisContext(code, 'dashboard');
     split = code.trim().split(/\s+/);
     if (result && _.isFunction(result.toHtml)) {
       return process.send({

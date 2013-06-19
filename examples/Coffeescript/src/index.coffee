@@ -5,10 +5,6 @@ marked = require 'marked'
 coffee = require 'coffee-script'
 cch = require 'comment-chunk-helper'
 
-# FIXME: Don't prompt coffee>, it looks bad.
-# FIXME: Runtime errors say evalMachine<anonymous>, not dashboard.
-# FIXME: Code coming out after prompt.
-
 parse = (code, cb) =>
   try 
     # We leave the block comments to be handled by comment-chunk-helper, although

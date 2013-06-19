@@ -5,7 +5,6 @@ var marked = require('marked');
 var esprima = require('esprima');
 var cch = require('comment-chunk-helper');
 
-// FIXME: Error messages don't look good.
 
 var formatEsprimaError = function(e) {
   return "SyntaxError: " + e.message.replace(/^Line (\d+): /, "") + "\n    at dashboard:" + e.lineNumber + ":" + e.column;
