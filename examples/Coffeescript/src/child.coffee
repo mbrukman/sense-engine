@@ -17,6 +17,6 @@ process.on 'message', (code) =>
     else 
       process.send({type: 'result', value: util.inspect(result)})
   catch err
-    process.send({type: 'error', value: err.stack.toString()})
+    process.send({type: 'error', value: coffee.helpers.prettyErrorMessage err, "dashboard", code, false})
 
 process.send 'ready'

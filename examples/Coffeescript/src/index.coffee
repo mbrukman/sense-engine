@@ -16,7 +16,7 @@ parse = (code, cb) =>
       statLocs.push {start: {line: l.first_line, column: l.first_column}, end: {line: l.last_line+1, column: l.last_column+1}}
     cb false, statLocs
   catch e
-    cb coffee.helpers.prettyErrorMessage e, "dashboard", code, false
+    cb code#coffee.helpers.prettyErrorMessage e, "dashboard", code, false
 
 chunk = cch
   parser: parse
@@ -67,30 +67,24 @@ exports.createDashboard = (dashboard) ->
     else if chunk.type == 'blockComment'
       dashboard.markdown marked chunk.value
       next()
-    else if chunk.type == 'error'
-      dashboard.error(chunk.value)
-      next()
     else
       code = chunk.value
-      if code.trim().length > 0
-        dashboard.code(code, 'coffeescript')
-        worker.send code
-        # The next message we get from the dashboard will be the result of 
-        # executing the code.
-        worker.once 'message', (m) ->
-          switch m.type
-            when 'result'
-              if m.value != 'undefined' then dashboard.text m.value
-            when 'error' 
-              dashboard.error m.value
-            when 'widget'
-              dashboard.widget m.value
-            when 'html'
-              dashboard.html m.value
-          # Whether the code returned a result or caused an error, the dashboard
-          # is now ready to take the next code chunk.
-          next()
-      else
+      if (chunk.type == 'code') then dashboard.code(code, 'coffeescript')
+      worker.send code
+      # The next message we get from the dashboard will be the result of 
+      # executing the code.
+      worker.once 'message', (m) ->
+        switch m.type
+          when 'result'
+            if m.value != 'undefined' then dashboard.text m.value
+          when 'error' 
+            dashboard.error m.value
+          when 'widget'
+            dashboard.widget m.value
+          when 'html'
+            dashboard.html m.value
+        # Whether the code returned a result or caused an error, the dashboard
+        # is now ready to take the next code chunk.
         next()
 
   dashboard.chunk = chunk

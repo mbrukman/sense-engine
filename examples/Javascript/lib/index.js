@@ -39,6 +39,11 @@ var parse = function(code, cb) {
     cb(false, getEsprimaLocs(ast));    
   }
   catch (e) {
+    // We should be able to simply pass the code on and let the engine in
+    // child.js deal with presenting the syntax error, but unfortunately
+    // that won't work until https://github.com/joyent/node/issues/3452
+    // is fixed. For now, we let Esprima format the syntax error. This will
+    // be sent right to the dashboard.
     cb(formatEsprimaError(e));
   }
 };
