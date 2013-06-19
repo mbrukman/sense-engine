@@ -1,7 +1,7 @@
 {
   "name": "sense-dashboard",
   "description": "Utilities for constructing dashboards for the Sense platform.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "./lib/index.js",
   "url": "http://www.senseplatform.com/",
   "license": "MIT",
