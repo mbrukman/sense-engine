@@ -1,13 +1,11 @@
 coffee = require('coffee-script')
 util = require('util')
+vm = require('vm')
 _ = require('underscore')
 
 process.on 'message', (code) =>
   try
-    result = coffee.eval("("+ code + "\n)", {
-      filename: 'dashboard',
-      modulename: 'dashboard'
-    })
+    result = vm.runInThisContext coffee.compile("("+ code + "\n)", {bare: true}), "dashboard"
     split = code.trim().split(/\s+/)
     if (result and _.isFunction(result.toHtml)) 
       process.send({type: 'html', value: result.toHtml()})

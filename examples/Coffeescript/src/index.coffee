@@ -5,6 +5,10 @@ marked = require 'marked'
 coffee = require 'coffee-script'
 cch = require 'comment-chunk-helper'
 
+# FIXME: Don't prompt coffee>, it looks bad.
+# FIXME: Runtime errors say evalMachine<anonymous>, not dashboard.
+# FIXME: Code coming out after prompt.
+
 parse = (code, cb) =>
   try 
     # We leave the block comments to be handled by comment-chunk-helper, although
@@ -28,7 +32,6 @@ exports.createDashboard = (dashboard) ->
   # We report that the dashboard is ready to start taking input.
   worker.once 'message', readyListener = (m) ->
     if m == 'ready'
-      dashboard.prompt('coffee> ')
       dashboard.ready()
     else
       worker.once 'message', readyListener
@@ -62,17 +65,14 @@ exports.createDashboard = (dashboard) ->
     if chunk.type == 'comment'
       dashboard.comment(chunk.value)
       # The dashboard is now ready to take the next code chunk.
-      dashboard.prompt('coffee> ')
       next()
     # If the chunk is a block comment, we assume that it's Markdown
     # documentation and pass it to the dashboard as such.
     else if chunk.type == 'blockComment'
       dashboard.markdown marked chunk.value
-      dashboard.prompt('coffee>')
       next()
     else if chunk.type == 'error'
       dashboard.error(chunk.value)
-      dashboard.prompt('coffee>')
       next()
     else
       code = chunk.value
@@ -93,10 +93,8 @@ exports.createDashboard = (dashboard) ->
               dashboard.html m.value
           # Whether the code returned a result or caused an error, the dashboard
           # is now ready to take the next code chunk.
-          dashboard.prompt('coffee> ')
           next()
       else
-        dashboard.prompt('coffee> ')
         next()
 
   dashboard.chunk = chunk
