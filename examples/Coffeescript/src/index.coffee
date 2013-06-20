@@ -13,7 +13,7 @@ parse = (code, cb) =>
     statLocs = []
     for stat in statements
       l = stat.locationData
-      statLocs.push {start: {line: l.first_line, column: l.first_column}, end: {line: l.last_line+1, column: l.last_column+1}}
+      statLocs.push {start: {line: l.first_line, column: l.first_column}, end: {line: l.last_line, column: l.last_column}}
     cb false, statLocs
   catch e
     cb code#coffee.helpers.prettyErrorMessage e, "dashboard", code, false

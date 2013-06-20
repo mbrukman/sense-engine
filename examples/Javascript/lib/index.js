@@ -2,27 +2,36 @@ var cp = require('child_process');
 var path = require('path');
 var _ = require('underscore');
 var marked = require('marked');
-var esprima = require('esprima');
+var uglify = require('uglify-js');
 var cch = require('comment-chunk-helper');
 
-
-var formatEsprimaError = function(e) {
-  return "SyntaxError: " + e.message.replace(/^Line (\d+): /, "") + "\n    at dashboard:" + e.lineNumber + ":" + e.column;
+var repeat = function(s, n) {
+  var out = ""
+  for (var i = 0; i < n; i++) out += s;
+  return out;
 }
 
-var getEsprimaLocs = function(ast) {
+var formatError = function(code, e) {
+  msg = [
+    "dashboard:" + e.line + ":" + e.col + ": " + e.message,
+    code.split("\n")[e.line-1],
+    repeat(" ", e.col) + "^"
+  ]
+  return msg.join("\n");
+}
+
+var getStatLocs = function(ast) {
   var statLocs = [];
   for (var i=0; i<ast.body.length;i++) {
     var stat = ast.body[i];
     statLocs.push({
       start: {
-        line: stat.loc.start.line - 1, // esprima indexes lines starting at 1
-        column: stat.loc.start.column        // but columns starting at 0
+        line: stat.start.line-1,    // uglify indexes lines starting at 1
+        column: stat.start.col      // but columns starting at 0
       },
       end: {
-        line: stat.loc.end.line,           // esprima's upper bound line is inclusive, 
-                                       // but indexed starting at 1
-        column: stat.loc.end.column        // its upper bound column is exclusive
+        line: stat.end.line-1,         
+        column: stat.end.col
       }
     });
   }
@@ -32,19 +41,16 @@ var getEsprimaLocs = function(ast) {
 
 var parse = function(code, cb) {
   try {
-    // Esprima has the ability to parse comments, but we may as well let 
-    // comment-chunk-helper do it, as it will intersperse them correctly
-    // with code and output.
-    var ast = esprima.parse(code, {loc: true});
-    cb(false, getEsprimaLocs(ast));    
+    var ast = uglify.parse(code, {loc: true});
+    cb(false, getStatLocs(ast));    
   }
   catch (e) {
     // We should be able to simply pass the code on and let the engine in
     // child.js deal with presenting the syntax error, but unfortunately
     // that won't work until https://github.com/joyent/node/issues/3452
-    // is fixed. For now, we let Esprima format the syntax error. This will
+    // is fixed. For now, we manually format the syntax error. This will
     // be sent right to the dashboard.
-    cb(formatEsprimaError(e));
+    cb(formatError(code, e));
   }
 };
 
