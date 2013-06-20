@@ -15,7 +15,7 @@ process.on('message', function(code) {
     } else if (result && _.isFunction(result.toWidget)) {
       return process.send({
         type: 'widget',
-        value: result.toWidget()
+        value: result.toWidget().toString()
       });
     } else {
       return process.send({

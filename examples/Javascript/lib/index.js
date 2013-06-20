@@ -1,8 +1,12 @@
+// FIXME: Capture assignments.
+// FIXME: require not present in globals.
+// FIXME: "1234" given incorrect end position.
+
 var cp = require('child_process');
 var path = require('path');
 var _ = require('underscore');
 var marked = require('marked');
-var uglify = require('uglify-js');
+var acorn = require('acorn');
 var cch = require('comment-chunk-helper');
 
 var repeat = function(s, n) {
@@ -13,9 +17,9 @@ var repeat = function(s, n) {
 
 var formatError = function(code, e) {
   msg = [
-    "dashboard:" + e.line + ":" + e.col + ": " + e.message,
-    code.split("\n")[e.line-1],
-    repeat(" ", e.col) + "^"
+    "dashboard:" + e.loc.line + ":" + e.loc.column + ": " + e.message.replace(/\(\d+:\d+\)$/, ""),
+    code.split("\n")[e.loc.line-1],
+    repeat(" ", e.loc.column) + "^"
   ]
   return msg.join("\n");
 }
@@ -26,23 +30,22 @@ var getStatLocs = function(ast) {
     var stat = ast.body[i];
     statLocs.push({
       start: {
-        line: stat.start.line-1,    // uglify indexes lines starting at 1
-        column: stat.start.col      // but columns starting at 0
+        line: stat.loc.start.line-1,    // acorn indexes lines starting at 1
+        column: stat.loc.start.column   // but columns starting at 0
       },
       end: {
-        line: stat.end.line-1,         
-        column: stat.end.col
+        line: stat.loc.end.line-1,         
+        column: stat.loc.end.column - 1 // acorn's upper bound is exclusive
       }
     });
   }
   return statLocs;
 }
 
-
 var parse = function(code, cb) {
   try {
-    var ast = uglify.parse(code, {loc: true});
-    cb(false, getStatLocs(ast));    
+    var ast = acorn.parse(code, {locations: true});
+    cb(false, getStatLocs(ast))
   }
   catch (e) {
     // We should be able to simply pass the code on and let the engine in
@@ -50,7 +53,7 @@ var parse = function(code, cb) {
     // that won't work until https://github.com/joyent/node/issues/3452
     // is fixed. For now, we manually format the syntax error. This will
     // be sent right to the dashboard.
-    cb(formatError(code, e));
+    cb(formatError(code,e));
   }
 };
 
@@ -62,7 +65,6 @@ var chunk = cch({
     right: "*/"
   }
 });
-
 
 exports.createDashboard = function(dashboard) {
   worker = cp.fork(path.join(__dirname, 'child'), [], {
