@@ -2,7 +2,8 @@ coffee = require('coffee-script')
 util = require('util')
 vm = require('vm')
 _ = require('underscore')
-# FIXME: 'require' is not defined in the dashboard.
+global.require = require
+serialize = global.serialize or (obj) => obj.toString() 
 process.on 'message', (code) =>
   try
     result = vm.runInThisContext coffee.compile("("+ code + "\n)", {bare: true}), "dashboard"

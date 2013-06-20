@@ -1,7 +1,10 @@
 var util = require('util');
 var _ = require('underscore');
 var vm = require('vm');
-
+global.require = require;
+var serialize = global.serialize || function(obj) {
+  return obj.toString();
+}
 process.on('message', function(code) {
   var result, split;
   try {

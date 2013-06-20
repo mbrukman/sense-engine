@@ -1,6 +1,4 @@
-// FIXME: Capture assignments.
-// FIXME: require not present in globals.
-// FIXME: "1234" given incorrect end position.
+// TODO: Capture assignments.
 
 var cp = require('child_process');
 var path = require('path');
