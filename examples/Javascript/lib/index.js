@@ -14,12 +14,17 @@ var repeat = function(s, n) {
 }
 
 var formatError = function(code, e) {
-  msg = [
-    "dashboard:" + e.loc.line + ":" + e.loc.column + ": " + e.message.replace(/\(\d+:\d+\)$/, ""),
-    code.split("\n")[e.loc.line-1],
-    repeat(" ", e.loc.column) + "^"
-  ]
-  return msg.join("\n");
+  try {
+    msg = [
+      "dashboard:" + e.loc.line + ":" + e.loc.column + ": " + e.message.replace(/\(\d+:\d+\)$/, ""),
+      code.split("\n")[e.loc.line-1],
+      repeat(" ", e.loc.column) + "^"
+    ]
+    return msg.join("\n");    
+  }
+  catch (err) {
+    return err.stack.toString();
+  }
 }
 
 var getStatLocs = function(ast) {
@@ -34,15 +39,25 @@ var getStatLocs = function(ast) {
       end: {
         line: stat.loc.end.line-1,         
         column: stat.loc.end.column - 1 // acorn's upper bound is exclusive
-      }
+      },
+      properties: {assignment: stat.assignment}
     });
   }
   return statLocs;
 }
-
+var markAssignments = function(ast) {
+  for (var i = 0; i < ast.body.length; i++) {
+    if (ast.body[i].type == 'ExpressionStatement') {
+      if (ast.body[i].expression.type == 'AssignmentExpression') {
+        ast.body[i].assignment = true;
+      }
+    }    
+  }
+}
 var parse = function(code, cb) {
   try {
     var ast = acorn.parse(code, {locations: true});
+    markAssignments(ast)
     cb(false, getStatLocs(ast))
   }
   catch (e) {
@@ -144,7 +159,7 @@ exports.createDashboard = function(dashboard) {
       return worker.once('message', function(m) {
         switch (m.type) {
           case 'result':
-            if (m.value !== 'undefined') {
+            if (m.value !== 'undefined' && (!chunk.properties || !chunk.properties.assignment)) {
               dashboard.text(m.value);
             }
             break;

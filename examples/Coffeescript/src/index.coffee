@@ -13,7 +13,10 @@ parse = (code, cb) =>
     statLocs = []
     for stat in statements
       l = stat.locationData
-      statLocs.push {start: {line: l.first_line, column: l.first_column}, end: {line: l.last_line, column: l.last_column}}
+      loc = {start: {line: l.first_line, column: l.first_column}, end: {line: l.last_line, column: l.last_column}}
+      if (stat.__proto__.constructor.name == "Assign") 
+        loc.properties = {assignment: true}
+      statLocs.push loc
     cb false, statLocs
   catch e
     cb code#coffee.helpers.prettyErrorMessage e, "dashboard", code, false
@@ -76,7 +79,7 @@ exports.createDashboard = (dashboard) ->
       worker.once 'message', (m) ->
         switch m.type
           when 'result'
-            if m.value != 'undefined' then dashboard.text m.value
+            if m.value != 'undefined' and (!chunk.properties or !chunk.properties.assignment) then dashboard.text m.value
           when 'error' 
             dashboard.error m.value
           when 'widget'
