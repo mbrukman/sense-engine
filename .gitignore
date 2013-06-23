@@ -1,0 +1,6 @@
+examples/Coffeescript/lib/
+examples/Coffeescript/node_modules/
+examples/Echo/node_modules/
+examples/Javascript/node_modules/
+node_modules/
+sense-dashboard-*.tgz

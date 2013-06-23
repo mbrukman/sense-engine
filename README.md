@@ -103,9 +103,25 @@ If your dashboard fails to launch on Sense, we'll do our best to report the erro
 To do this, type 
 
 ```javascript
-require('sense-dashboard').repl(dashboardModule, [startupScript])
+require('sense-dashboard').repl(dashboardModule.createDashboard, [startupScript])
 ```
 
 into node.js. The option startupScript argument is the name of a file containing code. The dashboard will execute the file's contents before taking any more input. All the dashboards in the examples folder have executable command-line versions in their `bin` folders.
 
 In the repl, you can switch into multiline mode by pressing ctrl-v. In multiline mode, the repl will accumulate the code you type or paste in until it sees a blank line.
+
+### Testing with Mocha or another unit testing framework
+
+To help you write unit tests for your dashboard, this module exports a function called `test` that turns the dashboard into a function that takes input and passes all resulting output to a callback. 
+
+```javascript
+require('sense-dashboard').test(dashboardModule.createDashboard, function(tester) {
+  var input = "console.log('hi')"
+  tester(input, function(output) {
+    // Output should be a code cell followed by a text cell. 
+    // Put code here to verify that.
+  });
+});
+```
+
+The tester function is delivered to a callback rather than returned because dashboard startup is usually asynchronous. However, you can use Mocha to [sequence asynchronous tests](http://visionmedia.github.io/mocha/#asynchronous-code). See the test folders in the Coffeescript and Javascript example

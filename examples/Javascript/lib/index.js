@@ -15,7 +15,7 @@ var repeat = function(s, n) {
 
 var formatError = function(code, e) {
   try {
-    msg = [
+    var msg = [
       "dashboard:" + e.loc.line + ":" + e.loc.column + ": " + e.message.replace(/\(\d+:\d+\)$/, ""),
       code.split("\n")[e.loc.line-1],
       repeat(" ", e.loc.column) + "^"
@@ -31,6 +31,7 @@ var getStatLocs = function(ast) {
   var statLocs = [];
   for (var i=0; i<ast.body.length;i++) {
     var stat = ast.body[i];
+    if (stat.type === "EmptyStatement") continue;
     statLocs.push({
       start: {
         line: stat.loc.start.line-1,    // acorn indexes lines starting at 1
@@ -40,7 +41,10 @@ var getStatLocs = function(ast) {
         line: stat.loc.end.line-1,         
         column: stat.loc.end.column - 1 // acorn's upper bound is exclusive
       },
-      properties: {assignment: stat.assignment}
+      properties: {
+        isAssignment: stat.isAssignment,
+        isExpression: stat.isExpression
+      }
     });
   }
   return statLocs;
@@ -48,8 +52,9 @@ var getStatLocs = function(ast) {
 var markAssignments = function(ast) {
   for (var i = 0; i < ast.body.length; i++) {
     if (ast.body[i].type == 'ExpressionStatement') {
+      ast.body[i].isExpression = true;
       if (ast.body[i].expression.type == 'AssignmentExpression') {
-        ast.body[i].assignment = true;
+        ast.body[i].isAssignment = true;
       }
     }    
   }
@@ -70,6 +75,21 @@ var parse = function(code, cb) {
   }
 };
 
+var prepareCode = function(code) {
+  // We have to first try the parenthesized version in order to mimic
+  // the Node.js repl's effective syntax.
+  // See https://github.com/joyent/node/blob/master/lib/repl.js#L244.
+  // Unfortunately that means we have to do another parse.
+  var pCode = "(" + code + ")"
+  try {
+    acorn.parse(pCode);
+    return pCode
+  }
+  catch (err) {
+    return code;  
+  }
+}
+
 var chunk = cch({
   parser: parse,
   lineComment: "//",
@@ -80,7 +100,7 @@ var chunk = cch({
 });
 
 exports.createDashboard = function(dashboard) {
-  worker = cp.fork(path.join(__dirname, 'child'), [], {
+  var worker = cp.fork(path.join(__dirname, 'child'), [], {
     silent: true
   });
 
@@ -153,13 +173,14 @@ exports.createDashboard = function(dashboard) {
     else {
       var code = chunk.value;
       dashboard.code(code, 'javascript');
-      worker.send(code);
+      // To mimic the Node.js repl syntax, we need to do some preprocessing.
+      worker.send(prepareCode(code));
       // The next message we get from the dashboard will be the result of 
       // executing the code.
       return worker.once('message', function(m) {
         switch (m.type) {
           case 'result':
-            if (m.value !== 'undefined' && (!chunk.properties || !chunk.properties.assignment)) {
+            if (m.value !== 'undefined' && (!chunk.properties || !chunk.properties.isAssignment)) {
               dashboard.text(m.value);
             }
             break;

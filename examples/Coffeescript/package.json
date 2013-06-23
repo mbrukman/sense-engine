@@ -5,7 +5,11 @@
   "main": "./lib",
   "license": "MIT",
   "devDependencies": {
-		"shelljs": "~0.0.6pre2"
+		"shelljs": "~0.0.6pre2",
+    "sense-dashboard": "~0.0.1",
+    "mocha": "~1.11.0",
+    "optimist": "~0.5.2",
+    "chai": "~1.7.0"
   },
   "dependencies": {
     "underscore": "~1.3.3",
