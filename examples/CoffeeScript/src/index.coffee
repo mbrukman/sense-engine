@@ -1,7 +1,6 @@
 cp = require 'child_process'
 path = require 'path'
 _ = require 'underscore'
-marked = require 'marked'
 coffee = require 'coffee-script'
 cch = require 'comment-chunk-helper'
 
@@ -19,7 +18,7 @@ parse = (code, cb) =>
       statLocs.push loc
     cb false, statLocs
   catch e
-    cb code#coffee.helpers.prettyErrorMessage e, "dashboard", code, false
+    cb coffee.helpers.prettyErrorMessage e, "dashboard", code, false
 
 chunk = cch
   parser: parse
@@ -34,12 +33,6 @@ exports.createDashboard = (dashboard) ->
       dashboard.ready()
     else
       worker.once 'message', readyListener
-
-  # We capture all output of the dashboard and report it as text. Note
-  # that this will catch calls to console.log and such, not the results
-  # of expressions that we evaluate.
-  worker.stdout.on 'data', (data) -> dashboard.text data
-  worker.stderr.on 'data', (data) -> dashboard.text data
 
   worker.on 'exit', process.exit
 
@@ -74,7 +67,10 @@ exports.createDashboard = (dashboard) ->
     # If the chunk is a block comment, we assume that it's Markdown
     # documentation and pass it to the dashboard as such.
     else if chunk.type == 'blockComment'
-      dashboard.markdown marked chunk.value
+      dashboard.markdown chunk.value
+      next()
+    else if chunk.type == 'error'
+      dashboard.error {message: chunk.value}
       next()
     else
       code = chunk.value

@@ -39,10 +39,9 @@ describe 'io', =>
       tester "(", (output) =>
         assert.equal(output.length, 1)
         assert.equal(output[0].type, "error")
-        assert.equal(output[0].data.split("\n").length, 3)
+        assert.equal(output[0].data.message.split("\n").length, 3)
         done()
     
-  
   it 'should render block comments', (done) =>
     tester "###\nSome documentation.\n###", (output) =>
       assert.equal(output.length, 1)

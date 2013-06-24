@@ -1,17 +1,14 @@
-// TODO: Capture assignments.
-
 var cp = require('child_process');
 var path = require('path');
 var _ = require('underscore');
-var marked = require('marked');
 var acorn = require('acorn');
 var cch = require('comment-chunk-helper');
 
 var repeat = function(s, n) {
-  var out = ""
+  var out = "";
   for (var i = 0; i < n; i++) out += s;
   return out;
-}
+};
 
 var formatError = function(code, e) {
   try {
@@ -19,13 +16,13 @@ var formatError = function(code, e) {
       "dashboard:" + e.loc.line + ":" + e.loc.column + ": " + e.message.replace(/\(\d+:\d+\)$/, ""),
       code.split("\n")[e.loc.line-1],
       repeat(" ", e.loc.column) + "^"
-    ]
+    ];
     return msg.join("\n");    
   }
   catch (err) {
     return err.stack.toString();
   }
-}
+};
 
 var getStatLocs = function(ast) {
   var statLocs = [];
@@ -48,22 +45,24 @@ var getStatLocs = function(ast) {
     });
   }
   return statLocs;
-}
+};
+
 var markAssignments = function(ast) {
   for (var i = 0; i < ast.body.length; i++) {
-    if (ast.body[i].type == 'ExpressionStatement') {
+    if (ast.body[i].type === 'ExpressionStatement') {
       ast.body[i].isExpression = true;
-      if (ast.body[i].expression.type == 'AssignmentExpression') {
+      if (ast.body[i].expression.type === 'AssignmentExpression') {
         ast.body[i].isAssignment = true;
       }
     }    
   }
-}
+};
+
 var parse = function(code, cb) {
   try {
     var ast = acorn.parse(code, {locations: true});
-    markAssignments(ast)
-    cb(false, getStatLocs(ast))
+    markAssignments(ast);
+    cb(false, getStatLocs(ast));
   }
   catch (e) {
     // We should be able to simply pass the code on and let the engine in
@@ -80,15 +79,15 @@ var prepareCode = function(code) {
   // the Node.js repl's effective syntax.
   // See https://github.com/joyent/node/blob/master/lib/repl.js#L244.
   // Unfortunately that means we have to do another parse.
-  var pCode = "(" + code + ")"
+  var pCode = "(" + code + ")";
   try {
     acorn.parse(pCode);
-    return pCode
+    return pCode;
   }
   catch (err) {
     return code;  
   }
-}
+};
 
 var chunk = cch({
   parser: parse,
@@ -105,7 +104,7 @@ exports.createDashboard = function(dashboard) {
   // We report that the dashboard is ready to start taking input.
   var readyListener;
   worker.once('message', readyListener = function(m) {
-    if (m == 'ready') {
+    if (m === 'ready') {
       dashboard.ready();
     }
     else {
@@ -119,7 +118,7 @@ exports.createDashboard = function(dashboard) {
   // type 'text'. They can come at any time.
   worker.on('message', function(m) {
     if (m.type === "text") {
-      dashboard.text(m.value)
+      dashboard.text(m.value);
     }
   });
 
@@ -129,7 +128,6 @@ exports.createDashboard = function(dashboard) {
   // the globals.
   dashboard.complete = function(substr, cb) {
     var names,
-      _this = this;
     names = Object.getOwnPropertyNames(global);
     cb(_.filter(names, function(x) {
       return x.indexOf(substr) === 0;
@@ -157,12 +155,12 @@ exports.createDashboard = function(dashboard) {
     else if (chunk.type === 'blockComment') {
       // If the chunk is a block comment, we assume that it's Markdown
       // documentation and pass it to the dashboard as such.
-      dashboard.markdown(marked(chunk.value));
+      dashboard.markdown(chunk.value);
       next();
     }
     else if (chunk.type === 'error') {
       // If the chunk is a syntax error, we pass it right to the dashboard.
-      dashboard.error(chunk.value);
+      dashboard.error({message: chunk.value});
       next();
     }
     else {

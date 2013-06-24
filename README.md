@@ -100,13 +100,7 @@ The `sense` entry signals that your dashboard is in fact a dashboard, tells the 
 
 If your dashboard fails to launch on Sense, we'll do our best to report the error to you; but it's much easier to run your dashboard in a command line-based repl while developing and testing it, and then deploy to Sense after you're pretty sure it works.
 
-To do this, type 
-
-```JavaScript
-require('sense-dashboard').repl(dashboardModule.createDashboard, [startupScript])
-```
-
-into node.js. The option startupScript argument is the name of a file containing code. The dashboard will execute the file's contents before taking any more input. All the dashboards in the examples folder have executable command-line versions in their `bin` folders.
+To do this, pass the name of your module to the `sense-repl` binary. You can give it the `--pretty` option to format the output nicely and/or a `--startupScript` option, which is the name of a file containing code. The dashboard will execute the file's contents before taking any more input. 
 
 In the repl, you can switch into multiline mode by pressing ctrl-v. In multiline mode, the repl will accumulate the code you type or paste in until it sees a blank line.
 

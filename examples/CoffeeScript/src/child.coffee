@@ -37,7 +37,7 @@ process.on 'message', (code) =>
     else 
       reply = {type: 'result', value: util.inspect(result)}
   catch err
-    reply = {type: 'error', value: coffee.helpers.prettyErrorMessage err, "dashboard", code, false}
+    reply = {type: 'error', value: {message: err.name + ": " + err.message, details: coffee.helpers.prettyErrorMessage err, "dashboard", code, false}}
   flush()
   process.send reply
 

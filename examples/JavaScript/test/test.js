@@ -45,7 +45,7 @@ describe('io', function() {
       tester("(", function(output) {
       assert.equal(output.length, 1);
       assert.equal(output[0].type, "error");
-      assert.equal(output[0].data.split("\n").length, 3);
+      assert.equal(output[0].data.message.split("\n").length, 3);
       done();
     });
   });
