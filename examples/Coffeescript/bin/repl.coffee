@@ -8,4 +8,4 @@ argv = optimist.
   describe('s', 'A file to source before taking input from the user.').
   argv
 
-require('sense-dashboard').repl require('../src/index.coffee').createDashboard, argv.startupScript, {pretty: argv.pretty}
+require('sense-dashboard').repl require('../lib/index.js').createDashboard, argv.startupScript, {pretty: argv.pretty}
