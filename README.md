@@ -10,7 +10,7 @@ To deploy a custom dashboard, simply stick it in `/home/sense/node_modules` in o
 
 Your dashboard module should export a function of a single argument called `createDashboard`. The argument will be a dashboard instance, and the function should add the following attributes to it:
 
-```javascript
+```JavaScript
 exports.createDashboard = function(dashboard) {
 
   dashboard.complete = function(codeString, cb) {
@@ -46,7 +46,7 @@ It is important that none of these functions runs for a long time so that node.j
 
 The following output methods of the dashboard can be called at any time to handle output from the dashboard. In particular, they allow the 'execute' function to output any result or error associated with a chunk of code.
 
-```javascript
+```JavaScript
 // Display the string as plain text output.
 dashboard.text(string)
 
@@ -75,7 +75,7 @@ dashboard.prompt(string)
 // The string is HTML and should be displayed as such.
 dashboard.html(string)
 
-// The string is a Javascript widget that should be embedded in
+// The string is a JavaScript widget that should be embedded in
 // the output.
 dashboard.widget(string)
 ```
@@ -84,7 +84,7 @@ dashboard.widget(string)
 
 The `sense` entry signals that your dashboard is in fact a dashboard, tells the UI what name to give it in the dashboard types menu, tells it how to highlight code typed into the dashboard, etc. For example:
 
-```javascript
+```JavaScript
 {
   ...,
   "sense": {
@@ -102,7 +102,7 @@ If your dashboard fails to launch on Sense, we'll do our best to report the erro
 
 To do this, type 
 
-```javascript
+```JavaScript
 require('sense-dashboard').repl(dashboardModule.createDashboard, [startupScript])
 ```
 
@@ -114,7 +114,7 @@ In the repl, you can switch into multiline mode by pressing ctrl-v. In multiline
 
 To help you write unit tests for your dashboard, this module exports a function called `test` that turns the dashboard into a function that takes input and passes all resulting output to a callback. 
 
-```javascript
+```JavaScript
 require('sense-dashboard').test(dashboardModule.createDashboard, function(tester) {
   var input = "console.log('hi')"
   tester(input, function(output) {
@@ -124,4 +124,4 @@ require('sense-dashboard').test(dashboardModule.createDashboard, function(tester
 });
 ```
 
-The tester function is delivered to a callback rather than returned because dashboard startup is usually asynchronous. However, you can use Mocha to [sequence asynchronous tests](http://visionmedia.github.io/mocha/#asynchronous-code). See the test folders in the Coffeescript and Javascript example
+The tester function is delivered to a callback rather than returned because dashboard startup is usually asynchronous. However, you can use Mocha to [sequence asynchronous tests](http://visionmedia.github.io/mocha/#asynchronous-code). See the test folders in the CoffeeScript and JavaScript example

@@ -1,6 +1,6 @@
 {
   "name": "sense-coffee",
-  "description": "Coffeescript dashboard for the Sense platform.",
+  "description": "CoffeeScript dashboard for the Sense platform.",
   "version": "0.1.0",
   "main": "./lib",
   "license": "MIT",
@@ -21,7 +21,7 @@
     "prepublish": "cake build"
   },
   "sense": {
-    "name": "Coffeescript",
-    "mode": "coffeescript"
+    "name": "CoffeeScript",
+    "mode": "coffeeScript"
   }
 }

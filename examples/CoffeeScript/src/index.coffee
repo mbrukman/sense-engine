@@ -8,7 +8,7 @@ cch = require 'comment-chunk-helper'
 parse = (code, cb) =>
   try 
     # We leave the block comments to be handled by comment-chunk-helper, although
-    # Coffeescript does generate AST nodes for them.
+    # CoffeeScript does generate AST nodes for them.
     statements = _.filter coffee.nodes(code).expressions, (expr) => not expr.comment
     statLocs = []
     for stat in statements
