@@ -22,6 +22,6 @@
   },
   "sense": {
     "name": "CoffeeScript",
-    "mode": "coffeeScript"
+    "mode": "coffeescript"
   }
 }
