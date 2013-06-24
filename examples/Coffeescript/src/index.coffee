@@ -42,6 +42,12 @@ exports.createDashboard = (dashboard) ->
   worker.stderr.on 'data', (data) -> dashboard.text data
 
   worker.on 'exit', process.exit
+
+  # The stderr and stdout output of the worker will be delivered as messages of
+  # type 'text'. They can come at any time.
+  worker.on 'message', (m) =>
+    if m.type == "text"
+      dashboard.text m.value
   
   # A very simple autocomplete function that just matches against
   # the globals.
@@ -74,9 +80,10 @@ exports.createDashboard = (dashboard) ->
       code = chunk.value
       if (chunk.type == 'code') then dashboard.code(code, 'coffeescript')
       worker.send code
-      # The next message we get from the dashboard will be the result of 
+      # The next non-text message we get from the dashboard will be the result of 
       # executing the code.
-      worker.once 'message', (m) ->
+      worker.on 'message', (m) ->
+        result = true
         switch m.type
           when 'result'
             if m.value != 'undefined' and (!chunk.properties or !chunk.properties.assignment) then dashboard.text m.value
@@ -86,8 +93,12 @@ exports.createDashboard = (dashboard) ->
             dashboard.widget m.value
           when 'html'
             dashboard.html m.value
-        # Whether the code returned a result or caused an error, the dashboard
-        # is now ready to take the next code chunk.
-        next()
+          when 'text'
+            result = false
+        if result
+          # Whether the code returned a result or caused an error, the dashboard
+          # is now ready to take the next code chunk.
+          worker.removeListener 'message', arguments.callee
+          next()
 
   dashboard.chunk = chunk

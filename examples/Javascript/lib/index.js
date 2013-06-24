@@ -100,9 +100,7 @@ var chunk = cch({
 });
 
 exports.createDashboard = function(dashboard) {
-  var worker = cp.fork(path.join(__dirname, 'child'), [], {
-    silent: true
-  });
+  var worker = cp.fork(path.join(__dirname, 'child'), [], {});
 
   // We report that the dashboard is ready to start taking input.
   var readyListener;
@@ -117,15 +115,12 @@ exports.createDashboard = function(dashboard) {
 
   worker.on('exit', process.exit);
 
-
-  // We capture all output of the dashboard and report it as text. Note
-  // that this will catch calls to console.log and such, not the results
-  // of expressions that we evaluate.
-  worker.stdout.on('data', function(data) {
-    return dashboard.text(data);
-  });
-  worker.stderr.on('data', function(data) {
-    return dashboard.text(data);
+  // The stderr and stdout output of the worker will be delivered as messages of
+  // type 'text'. They can come at any time.
+  worker.on('message', function(m) {
+    if (m.type === "text") {
+      dashboard.text(m.value)
+    }
   });
 
   dashboard.chunk = chunk;
@@ -175,9 +170,10 @@ exports.createDashboard = function(dashboard) {
       dashboard.code(code, 'javascript');
       // To mimic the Node.js repl syntax, we need to do some preprocessing.
       worker.send(prepareCode(code));
-      // The next message we get from the dashboard will be the result of 
-      // executing the code.
-      return worker.once('message', function(m) {
+      // The next message we get from the dashboard that isn't text will be 
+      // the result of executing the code.
+      worker.on('message', function(m) {
+        var result = true;
         switch (m.type) {
           case 'result':
             if (m.value !== 'undefined' && (!chunk.properties || !chunk.properties.isAssignment)) {
@@ -192,10 +188,18 @@ exports.createDashboard = function(dashboard) {
             break;
           case 'html':
             dashboard.html(m.value);
+            break;
+          case 'text':
+            // We don't call 'next' based on simple text events.
+            result = false;
+            break;
+          }
+        if (result) {
+          // Whether the code returned a result or caused an error, the dashboard
+          // is now ready to take the next code chunk.
+          worker.removeListener('message', arguments.callee);
+          next();          
         }
-        // Whether the code returned a result or caused an error, the dashboard
-        // is now ready to take the next code chunk.
-        next();
       });
     }
   };

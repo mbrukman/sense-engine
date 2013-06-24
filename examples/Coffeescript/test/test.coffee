@@ -69,4 +69,32 @@ describe 'io', =>
       assert.equal(output.length, 4)
       done()
     
-  
+  it 'should preserve result ordering', (done) =>
+    code = (i for i in [0...1000]).join("\n")
+    tester code, (output) =>
+      for i in [0...output.length]
+        if i % 2 == 0
+          assert.equal(output[i].type, "code")
+        else
+          assert.equal(output[i].type, "text")
+      done()
+
+  it 'should preserve error ordering', (done) =>
+    code = ("q" for i in [1...1000]).join("\n")
+    tester code, (output) =>
+      for i in [0...output.length]
+        if i % 2 == 0
+          assert.equal(output[i].type, "code")
+        else
+          assert.equal(output[i].type, "error")
+      done()
+
+  it 'should preserve stdout ordering', (done) =>
+    code = ("console.log(#{i})" for i in [0...1000]).join("\n")
+    tester code, (output) =>
+      for i in [0...output.length]
+        if i % 2 == 0
+          assert.equal(output[i].type, "code", "Mismatch at #{i}")
+        else
+          assert.equal(output[i].type, "text", "Mismatch at #{i}")
+      done()

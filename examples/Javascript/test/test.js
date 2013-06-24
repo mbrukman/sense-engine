@@ -92,4 +92,46 @@ describe('io', function() {
     });
   });
 
+  it('should preserve result ordering', function (done) {
+    var code = [];
+    for (var i = 0; i < 1000; i++) {
+      code.push(i);
+    }
+    tester(code.join("\n"), function (output) {
+      for (i = 0; i < output.length; i++) {
+        if (i % 2 === 0) assert.equal(output[i].type, "code")
+        else assert.equal(output[i].type, "text")
+      }
+      done()
+    });
+  });
+
+  it('should preserve error ordering', function (done) {
+    var code = [];
+    for (var i = 0; i < 1000; i++) {
+      code.push("q");
+    }
+    tester(code.join("\n"), function (output) {
+      for (i = 0; i < output.length; i++) {
+        if (i % 2 === 0) assert.equal(output[i].type, "code")
+        else assert.equal(output[i].type, "error")
+      }
+      done()
+    });
+  });
+
+  it('should preserve stdout ordering', function (done) {
+    var code = [];
+    for (var i = 0; i < 1000; i++) {
+      code.push("console.log(" + i + ")");
+    }
+    tester(code.join("\n"), function (output) {
+      for (i = 0; i < output.length; i++) {
+        if (i % 2 === 0) assert.equal(output[i].type, "code")
+        else assert.equal(output[i].type, "text")
+      }
+      done()
+    });
+  });
+
 });
