@@ -12,7 +12,7 @@ var argv = optimist.
 
 var path = require('path');
 require('../lib').repl(
-  require(path.join(process.cwd(), argv._[0]).createDashboard, 
+  require(path.join(process.cwd(), argv._[0])).createDashboard, 
   argv.startupScript, 
   {pretty: argv.hasOwnProperty('pretty')}
 );
