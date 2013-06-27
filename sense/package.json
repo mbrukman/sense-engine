@@ -1,0 +1,8 @@
+{
+  "name": "sense",
+  "description": "Utility functions for use from dashboards on the Sense Platform.",
+  "version": "0.0.1",
+  "main": "./sense.js",
+  "url": "http://www.senseplatform.com/",
+  "license": "MIT"
+}
