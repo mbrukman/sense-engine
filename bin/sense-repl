@@ -9,8 +9,10 @@ var argv = optimist.
   describe('s', 'A file to source before taking input from the user.').
   demand(1).
   argv;
+
+var path = require('path');
 require('../lib').repl(
-  require(argv._[0]).createDashboard, 
+  require(path.join(process.cwd(), argv._[0]).createDashboard, 
   argv.startupScript, 
   {pretty: argv.hasOwnProperty('pretty')}
 );
