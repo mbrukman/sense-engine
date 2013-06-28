@@ -14,124 +14,109 @@ describe('io', function() {
     });
   });
 
-  it('should not output assignment results', function(done) {
-    tester("a=0", function(output) {
-      assert.equal(output.length, 1);
-      assert.equal(output[0].type, "code");
+  var assertOutputTypes = function(input, types, done) {
+    tester(input, function (output) {
+      try {
+        assert.equal(output.length, types.length)
+      }
+      catch (e) {
+        done(e)
+        return                
+      }
+      for (var i = 0; i < types.length; i++) {
+        try {
+          assert.equal(output[i].type, types[i]);
+        }
+        catch (e) {
+          done(e);
+          return;                                
+        }
+      }
       done();
     });
+  };
+
+  it('should not output assignment results', function(done) {
+    assertOutputTypes("a=0", ["code"], done);
   });
 
   it('should output other results', function(done) {
-    tester("a", function(output) {
-      assert.equal(output.length, 2);
-      assert.equal(output[0].type, "code");
-      assert.equal(output[1].type, "text");
-      assert.equal(output[1].data, "0");
-      done();
-    });
+    assertOutputTypes("a", ["code", "text"], done);
   });
 
   it('should output code before runtime errors', function(done) {
-    tester("b", function(output) {
-      assert.equal(output.length, 2);
-      assert.equal(output[0].type, "code");
-      assert.equal(output[1].type, "error");
-      done();
-    });
+    assertOutputTypes("b", ["code", "error"], done);
   });
 
   it('should output short syntax errors with no code', function(done) {
-      tester("(", function(output) {
-      assert.equal(output.length, 1);
-      assert.equal(output[0].type, "error");
-      assert.equal(output[0].data.message.split("\n").length, 3);
-      done();
-    });
+    assertOutputTypes("(", ["error"], done);
   });
 
   it('should render block comments', function(done) {
-    tester("/*\nSome documentation.\n*/", function(output) {
-      assert.equal(output.length, 1);
-      assert.equal(output[0].type, "html");
-      done();
-    });
+    assertOutputTypes("/*\nSome documentation.\n*/", ["html"], done);
   });
 
   it('should not render line comments', function(done) {
-    tester("//line1\n//line2\n\n//line3", function(output) {
-      assert.equal(output.length, 2);
-      assert.equal(output[0].type, "comment");
-      assert.equal(output[1].type, "comment");
-      done();
-    });
+    assertOutputTypes("//line1\n//line2\n\n//line3", ["comment", "comment"], done);
   });
 
   it('should group multiline statements', function(done) {
-    tester("(function(x) {\n  return x*x;\n})(2);", function(output) {
-      assert.equal(output.length, 2);
-      assert.equal(output[0].type, "code");
-      assert.equal(output[1].type, "text");
-      done();
-    });
+    assertOutputTypes("(function(x) {\n  return x*x;\n})(2);", ["code", "text"], done);
   });
 
   it('schould recognize unparenthesized object literals', function(done) {
-    tester("{x: 0};", function(output) {
-      assert.equal(output.length, 2);
-      assert.equal(output[0].type, "code");
-      assert.equal(output[1].type, "text");
-      done();
-    });
+    assertOutputTypes("{x: 0};", ["code", "text"], done);
   });
 
   it('should tolerate blank lines', function(done) {
-    tester("a\n\nb", function(output) {
-      assert.equal(output.length, 4);
-      done();
-    });
+    assertOutputTypes("a\n\nb", ["code", "text", "code", "error"], done);
+  });
+
+  it('should produce html output', function(done) {
+    assertOutputTypes("sense.html('a')", ["code", "html"], done);
+  });
+
+  it('should produce widget output', function(done) {
+    assertOutputTypes("sense.widget('a')", ["code", "widget"], done);
   });
 
   it('should preserve result ordering', function (done) {
+    var n = 1000;
     var code = [];
-    for (var i = 0; i < 1000; i++) {
+    for (var i = 0; i < n; i++) {
       code.push(i);
     }
-    tester(code.join("\n"), function (output) {
-      for (i = 0; i < output.length; i++) {
-        if (i % 2 === 0) assert.equal(output[i].type, "code")
-        else assert.equal(output[i].type, "text")
-      }
-      done()
-    });
+    var types = [];
+    for (i = 0; i < n; i++) {
+      types.push("code", "text");
+    }
+    assertOutputTypes(code.join("\n"), types, done);
   });
 
   it('should preserve error ordering', function (done) {
+    var n = 1000;
     var code = [];
-    for (var i = 0; i < 1000; i++) {
+    for (var i = 0; i < n; i++) {
       code.push("q");
     }
-    tester(code.join("\n"), function (output) {
-      for (i = 0; i < output.length; i++) {
-        if (i % 2 === 0) assert.equal(output[i].type, "code")
-        else assert.equal(output[i].type, "error")
-      }
-      done()
-    });
+    var types = [];
+    for (i = 0; i < n; i++) {
+      types.push("code", "error");
+    }
+    assertOutputTypes(code.join("\n"), types, done);
   });
 
   it('should preserve stdout ordering', function (done) {
+    var n = 1000;
     var code = [];
-    for (var i = 0; i < 1000; i++) {
+    for (var i = 0; i < n; i++) {
       code.push("console.log(" + i + ")");
     }
-    tester(code.join("\n"), function (output) {
-      for (i = 0; i < output.length; i++) {
-        if (i % 2 === 0) assert.equal(output[i].type, "code")
-        else assert.equal(output[i].type, "text")
-      }
-      done()
-    });
+    var types = [];
+    for (i = 0; i < n; i++) {
+      types.push("code", "text");
+    }
+    assertOutputTypes(code.join("\n"), types, done);
   });
 
 });

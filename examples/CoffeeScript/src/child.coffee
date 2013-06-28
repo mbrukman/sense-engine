@@ -4,7 +4,7 @@ vm = require('vm')
 _ = require 'underscore'
 cp = require 'child_process'
 global.require = require
-# Add a utility module to the globals.
+# Add utilities to the globals.
 global.sense = {
   install: (pkg) => 
     proc = cp.spawn "npm", ["install", pkg]
