@@ -41,21 +41,21 @@ process.on('message', function(code) {
   var reply, result;
   try {
     result = vm.runInThisContext(code, 'dashboard');
-      if (result && _.isFunction(result.toHtml)) {
-        reply = {
-          type: 'html',
-          value: result.toHtml()
-        };
-      } else if (result && _.isFunction(result.toWidget)) {
-        reply = {
-          type: 'widget',
-          value: serialize(result.toWidget())
-        };
+      if (result && _.isFunction(result.toWidget)) {
+        reply = {type: 'result', value: {
+                  type: 'widget',
+                  value: serialize(result.toWidget())
+                }};
+      } else if (result && _.isFunction(result.toHtml)) {
+        reply = {type: 'result', value: {
+                  type: 'html',
+                  value: result.toHtml()
+                }};
       } else {
-        reply = {
-          type: 'result',
-          value: util.inspect(result)
-        };
+        reply = {type: 'result', value: {
+                  type: 'text',
+                  value: util.inspect(result)
+                }};
       }
     } catch (err) {
       reply = {

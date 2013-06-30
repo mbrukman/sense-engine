@@ -82,7 +82,7 @@ exports.createDashboard = (dashboard) ->
         result = true
         switch m.type
           when 'result'
-            if m.value != 'undefined' and (!chunk.properties or !chunk.properties.assignment) then dashboard.text m.value
+            if m.value != 'undefined' and (!chunk.properties or !chunk.properties.assignment) then dashboard[m.value.type] m.value.value
           when 'error' 
             dashboard.error m.value
           when 'widget'

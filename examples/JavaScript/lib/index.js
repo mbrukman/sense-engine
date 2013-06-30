@@ -175,7 +175,7 @@ exports.createDashboard = function(dashboard) {
         switch (m.type) {
           case 'result':
             if (m.value !== 'undefined' && (!chunk.properties || !chunk.properties.isAssignment)) {
-              dashboard.text(m.value);
+              dashboard[m.value.type](m.value.value);
             }
             break;
           case 'error':

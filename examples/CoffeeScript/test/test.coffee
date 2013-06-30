@@ -30,6 +30,15 @@ describe 'io', =>
   it 'should not output assignment results', (done) =>
     assertOutputTypes "a=0", ["code"], done
 
+  it 'should not output assigned widget results', (done) =>
+    assertOutputTypes "x={toWidget: -> 0}", ["code"], done
+
+  it 'should not output assigned html results', (done) =>
+    assertOutputTypes "y={toHtml: -> 0}", ["code"], done
+
+  it 'should prioritize widget output over html and text', (done) =>
+    assertOutputTypes "{toHtml: (-> 0), toWidget: -> 1}", ["code", "widget"], done
+
   it 'should output other results', (done) =>
     assertOutputTypes "a", ["code", "text"], done    
   

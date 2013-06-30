@@ -40,6 +40,18 @@ describe('io', function() {
     assertOutputTypes("a=0", ["code"], done);
   });
 
+  it('should not output assigned widgets', function(done) {
+    assertOutputTypes("x={toWidget: (function() {return 0;})}", ["code"], done);
+  });
+
+  it('should not output assigned html', function(done) {
+    assertOutputTypes("y={toHtml: (function() {return 0;})}", ["code"], done);
+  });
+
+  it('should prefer widget to html and text', function(done) {
+    assertOutputTypes("({toHtml: (function() {return 0;}), toWidget: (function() {return 0;})})", ["code", "widget"], done);
+  });
+
   it('should output other results', function(done) {
     assertOutputTypes("a", ["code", "text"], done);
   });

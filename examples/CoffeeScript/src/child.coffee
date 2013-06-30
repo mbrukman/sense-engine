@@ -37,15 +37,15 @@ process.on 'message', (code) =>
     else
       result = vm.runInThisContext coffee.compile("("+ code + "\n)", {bare: true}), "dashboard"
       split = code.trim().split(/\s+/)
-      if (result and _.isFunction(result.toHtml)) 
-        reply = {type: 'html', value: result.toHtml()}
-      
-      else if (result and _.isFunction(result.toWidget)) 
+      if (result and _.isFunction(result.toWidget)) 
         # This should return a string that can be evaled.
-        reply = {type: 'widget', value: serialize(result.toWidget())}
-      
+        reply = {type: 'result', value: {type: 'widget', value: serialize(result.toWidget())}}
+
+      else if (result and _.isFunction(result.toHtml)) 
+        reply = {type: 'result', value: {type: 'html', value: result.toHtml()}}
+            
       else 
-        reply = {type: 'result', value: util.inspect(result)}
+        reply = {type: 'result', value: {type: 'text', value: util.inspect(result)}}
   catch err
     reply = {type: 'error', value: {message: err.name + ": " + err.message, details: coffee.helpers.prettyErrorMessage err, "dashboard", code, false}}
   process.send reply
