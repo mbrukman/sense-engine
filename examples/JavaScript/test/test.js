@@ -85,11 +85,11 @@ describe('io', function() {
   });
 
   it('should produce html output', function(done) {
-    assertOutputTypes("sense.html('a')", ["code", "html"], done);
+    assertOutputTypes("({toHtml: function() {return 'a';}})", ["code", "html"], done);
   });
 
   it('should produce widget output', function(done) {
-    assertOutputTypes("sense.widget('a')", ["code", "widget"], done);
+    assertOutputTypes("({toWidget: function() {return 'a';}})", ["code", "widget"], done);
   });
 
   it('should preserve result ordering', function (done) {

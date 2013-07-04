@@ -4,18 +4,11 @@ vm = require('vm')
 _ = require 'underscore'
 cp = require 'child_process'
 global.require = require
-# Add utilities to the globals.
-global.sense = {
-  install: (pkg) => 
-    proc = cp.spawn "npm", ["install", pkg]
-    proc.stdout.on "data", (dat) => console.log dat.toString()
-    proc.stderr.on "data", (dat) => console.log dat.toString(),
-    undefined
-  html: (htmlCode) => process.send {type: 'html', value: htmlCode},
-  widget: (javascriptCode) => process.send {type: 'widget', value: javascriptCode}
-}
 
-serialize = global.serialize or (obj) => obj.toString() 
+try
+  serialize = require('sense').serialize
+finally
+  serialize = serialize or (obj) => obj.toString() 
 
 outputCatcher = (chunk, encoding, cb) =>
   try

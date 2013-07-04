@@ -65,10 +65,10 @@ describe 'io', =>
     assertOutputTypes "a\n\nb", ["code", "text", "code", "error"], done
    
   it 'should produce html output', (done) =>
-    assertOutputTypes "sense.html('a')", ["code", "html"], done
+    assertOutputTypes "{toHtml: -> 'a'}", ["code", "html"], done
 
   it 'should produce widget output', (done) =>
-    assertOutputTypes "sense.widget('a')", ["code", "widget"], done
+    assertOutputTypes "{toWidget: -> -> 'a'}", ["code", "widget"], done
 
   it 'should preserve result ordering', (done) =>
     n = 1000

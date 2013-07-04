@@ -4,27 +4,14 @@ var vm = require('vm');
 var cp = require('child_process');
 global.require = require;
 
-// Add utilities to the globals.
-global.sense = {
-  install: function(pkg) {
-    proc = cp.spawn("npm", ["install", pkg]);
-    proc.stdout.on("data", function(dat) {
-      console.log(dat.toString());
-    });
-    proc.stderr.on("data", function(dat) {
-      console.log(dat.toString());
-    });
-  },
-  html: function(htmlCode) {
-    process.send({type: 'html', value: htmlCode});
-  },
-  widget: function(javascriptCode){
-    process.send({type: 'widget', value: javascriptCode});
-  }
-};
-var serialize = global.serialize || function(obj) {
-  return obj.toString();
-};
+try {
+  var serialize = require('sense').serialize
+}
+finally {
+  serialize = serialize || function(obj) {
+    return obj.toString();
+  };
+}
 var outputCatcher = function(chunk, encoding, cb) {
   try {
     process.send({type: "text", value: chunk.toString()});
