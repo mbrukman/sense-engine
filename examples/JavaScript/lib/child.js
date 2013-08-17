@@ -4,14 +4,6 @@ var vm = require('vm');
 var cp = require('child_process');
 global.require = require;
 
-try {
-  var serialize = require('sense').serialize
-}
-finally {
-  serialize = serialize || function(obj) {
-    return obj.toString();
-  };
-}
 var outputCatcher = function(chunk, encoding, cb) {
   try {
     process.send({type: "text", value: chunk.toString()});
@@ -31,7 +23,7 @@ process.on('message', function(code) {
       if (result && _.isFunction(result.toWidget)) {
         reply = {type: 'result', value: {
                   type: 'widget',
-                  value: serialize(result.toWidget())
+                  value: result.toWidget()
                 }};
       } else if (result && _.isFunction(result.toHtml)) {
         reply = {type: 'result', value: {
