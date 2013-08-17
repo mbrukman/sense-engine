@@ -5,11 +5,6 @@ _ = require 'underscore'
 cp = require 'child_process'
 global.require = require
 
-try
-  serialize = require('sense').serialize
-finally
-  serialize = serialize or (obj) => obj.toString() 
-
 outputCatcher = (chunk, encoding, cb) =>
   try
     process.send {
@@ -32,7 +27,7 @@ process.on 'message', (code) =>
       split = code.trim().split(/\s+/)
       if (result and _.isFunction(result.toWidget)) 
         # This should return a string that can be evaled.
-        reply = {type: 'result', value: {type: 'widget', value: serialize(result.toWidget())}}
+        reply = {type: 'result', value: {type: 'widget', value: result.toWidget()}}
 
       else if (result and _.isFunction(result.toHtml)) 
         reply = {type: 'result', value: {type: 'html', value: result.toHtml()}}
