@@ -1,14 +1,14 @@
 ## Sense Platform dashboard creation utilities
 
-This package gives you everything you need to run your favorite programming language or console-based application as a dashboard on [the Sense Platform](senseplatform.com)'s cloud infrastructure, using the same user interface as the official dashboards. 
+This package gives you everything you need to run your favorite programming language or console-based application as an engine on [the Sense Platform](senseplatform.com)'s cloud infrastructure, using the same user interface as the official engines. 
 
-User-defined dashboards are [npm](npmjs.org) modules that export a single function, which complies with the specification documented below. Their package.json files must have an entry called `sense`. There are three example dashboards to get you started in the examples folder.
+User-defined engines are [npm](npmjs.org) modules that export a single function, which complies with the specification documented below. Their package.json files must have an entry called `sense`. There is a simple example engine to get you started in the examples folder. For real-life examples, see the [CoffeeScript](github.com/SensePlatform/CoffeeScriptEngine) and [JavaScript](github.com/SensePlatform/JavaScriptEngine) engines.
 
-To deploy a custom dashboard, simply stick it in `/home/sense/node_modules` in one of your projects. When you launch dashboards from that project in the future, the new dashboard type will be available in the drop-down menu.
+To deploy a custom engine, simply stick it in `/home/sense/node_modules` in one of your projects. When you launch dashboards from that project in the future, the new engine will be available in the dashboard type menu.
 
 ### The exported function
 
-Your dashboard module should export a function of a single argument called `createDashboard`. The argument will be a dashboard instance, and the function should add the following attributes to it:
+Your module should export a function of a single argument called `createDashboard`. The argument will be a dashboard instance, and the function should add the following attributes to it:
 
 ```JavaScript
 exports.createDashboard = function(dashboard) {
@@ -44,7 +44,7 @@ exports.createDashboard = function(dashboard) {
 
 It is important that none of these functions runs for a long time so that node.js is free to listen for incoming events. The execute function, in particular, should usually delegate to a separate thread or process.
 
-The following output methods of the dashboard can be called at any time to handle output from the dashboard. In particular, they allow the 'execute' function to output any result or error associated with a chunk of code.
+The following output methods of the dashboard object can be called at any time to emit output from the dashboard. In particular, they allow the 'execute' function to output any result or error associated with a chunk of code.
 
 ```JavaScript
 // Display the string as plain text output.
@@ -82,7 +82,7 @@ dashboard.widget(string)
 
 ### The `sense` entry in package.json
 
-The `sense` entry signals that your dashboard is in fact a dashboard, tells the UI what name to give it in the dashboard types menu, tells it how to highlight code typed into the dashboard, etc. For example:
+The `sense` entry signals that your module is in fact an engine, tells the UI what name to give it in the dashboard types menu, tells it how to highlight code typed into the dashboard, etc. For example:
 
 ```JavaScript
 {
@@ -98,7 +98,7 @@ The `sense` entry signals that your dashboard is in fact a dashboard, tells the 
 
 ### Testing from the command line
 
-If your dashboard fails to launch on Sense, we'll do our best to report the error to you; but it's much easier to run your dashboard in a command line-based repl while developing and testing it, and then deploy to Sense after you're pretty sure it works.
+If your engine fails to launch a dashboard on Sense, we'll do our best to report the error to you; but it's much easier to run your engine as a command line-based repl while developing and testing it, and then deploy to Sense after you're pretty sure it works.
 
 To do this, pass the name of your module to the `sense-repl` binary. You can give it the `--pretty` option to format the output nicely and/or a `--startupScript` option, which is the name of a file containing code. The dashboard will execute the file's contents before taking any more input. 
 
@@ -106,7 +106,7 @@ In the repl, you can switch into multiline mode by pressing ctrl-v. In multiline
 
 ### Testing with Mocha or another unit testing framework
 
-To help you write unit tests for your dashboard, this module exports a function called `test` that turns the dashboard into a function that takes input and passes all resulting output to a callback. 
+To help you write unit tests for your engine, this module exports a function called `test` that turns the engine into a function that takes input and passes all resulting output to a callback. 
 
 ```JavaScript
 require('sense-dashboard').test(dashboardModule.createDashboard, function(tester) {
@@ -118,4 +118,4 @@ require('sense-dashboard').test(dashboardModule.createDashboard, function(tester
 });
 ```
 
-The tester function is delivered to a callback rather than returned because dashboard startup is usually asynchronous. However, you can use Mocha to [sequence asynchronous tests](http://visionmedia.github.io/mocha/#asynchronous-code). See the test folders in the CoffeeScript and JavaScript example
+The tester function is delivered to a callback rather than returned because dashboard startup is usually asynchronous. However, you can use Mocha to [sequence asynchronous tests](http://visionmedia.github.io/mocha/#asynchronous-code). See the test folders in [these](github.com/SensePlatform/CoffeeScriptEngine) [two](github.com/SensePlatform/JavaScriptEngine) engines.
