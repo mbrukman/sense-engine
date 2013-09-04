@@ -1,8 +1,8 @@
 ## Sense Platform dashboard creation utilities
 
-This package gives you everything you need to run your favorite programming language or console-based application as an engine on [the Sense Platform](senseplatform.com)'s cloud infrastructure, using the same user interface as the official engines. 
+This package gives you everything you need to run your favorite programming language or console-based application as an engine on [the Sense Platform](http://www.senseplatform.com)'s cloud infrastructure, using the same user interface as the official engines. 
 
-User-defined engines are [npm](npmjs.org) modules that export a single function, which complies with the specification documented below. Their package.json files must have an entry called `sense`. There is a simple example engine to get you started in the examples folder. For real-life examples, see the [CoffeeScript](github.com/SensePlatform/CoffeeScriptEngine) and [JavaScript](github.com/SensePlatform/JavaScriptEngine) engines.
+User-defined engines are [npm](http://npmjs.org) modules that export a single function, which complies with the specification documented below. Their package.json files must have an entry called `sense`. There is a simple example engine to get you started in the examples folder. For real-life examples, see the [CoffeeScript](http://github.com/SensePlatform/CoffeeScriptEngine) and [JavaScript](http://github.com/SensePlatform/JavaScriptEngine) engines.
 
 To deploy a custom engine, simply stick it in `/home/sense/node_modules` in one of your projects. When you launch dashboards from that project in the future, the new engine will be available in the dashboard type menu.
 
@@ -118,4 +118,4 @@ require('sense-dashboard').test(dashboardModule.createDashboard, function(tester
 });
 ```
 
-The tester function is delivered to a callback rather than returned because dashboard startup is usually asynchronous. However, you can use Mocha to [sequence asynchronous tests](http://visionmedia.github.io/mocha/#asynchronous-code). See the test folders in [these](github.com/SensePlatform/CoffeeScriptEngine) [two](github.com/SensePlatform/JavaScriptEngine) engines.
+The tester function is delivered to a callback rather than returned because dashboard startup is usually asynchronous. However, you can use Mocha to [sequence asynchronous tests](http://visionmedia.github.io/mocha/#asynchronous-code). See the test folders in [these](http://github.com/SensePlatform/CoffeeScriptEngine) [two](http://github.com/SensePlatform/JavaScriptEngine) engines.
