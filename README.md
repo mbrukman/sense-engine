@@ -1,4 +1,4 @@
-## Sense Platform dashboard creation utilities
+## Sense Platform engine creation utilities
 
 This package gives you everything you need to run your favorite programming language or console-based application as an engine on [the Sense Platform](http://www.senseplatform.com)'s cloud infrastructure, using the same user interface as the official engines. 
 
