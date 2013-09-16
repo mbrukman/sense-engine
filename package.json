@@ -1,5 +1,5 @@
 {
-  "name": "sense-dashboard",
+  "name": "sense-engines",
   "description": "Utilities for constructing dashboards for the Sense platform.",
   "version": "0.0.7",
   "main": "./lib/index.js",

@@ -49,14 +49,15 @@ The single argument of `dashboard.output` is an object of the form `{mime, data,
 
 * `text/plain`: Unformatted text.
 * `text/r`, `text/python`, `text/javascript`, etc.: Code that should be displayed with syntax highlighting.
-* `text/comment`: Code comments that should not be formatted.
+* `text/comment`: A custom MIME type for code comments that should not be formatted.
+* `text/latex`: Latex that should be rendered and displayed using MathJax.
 * `text/markdown`: Markdown-formatted text that should be rendered and displayed as HTML.
 * `text/prompt`: A nonstandard dashboard prompt.
 * `text/html`: Arbitrary HTML that will be displayed in an iframe.
 * `application/javascript`: Arbitrary JavaScript code that will be run in the user's browser.
 * `application/error`: A custom MIME type for error messages. The data should be an object of the form `{message, details}` where message is 1-5 lines and details contains a stack trace or other detailed information.
 * `application/warning`: A custom MIME type for warnings. The data object should be of the same form as `application/error`'s.
-* `image/png`, `image/jpeg`, etc.: Images to be displayed in the dashboard. The data should be an object of the form `{src, height, width}`, where src is either a URL or a Base64-encoded string containing the image data.
+* `image/png`, `image/jpeg`, `image/svg+xml`, etc.: Images to be displayed in the dashboard. The data should be an object of the form `{src, height, width}`, where src is either a URL or a Base64-encoded string containing the image data.
 
 
 ### The sense field in package.json
