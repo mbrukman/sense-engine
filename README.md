@@ -2,7 +2,7 @@
 
 This package gives you everything you need to run your favorite programming language or console-based application as an engine on [the Sense Platform](http://www.senseplatform.com)'s cloud infrastructure, using the same user interface as the official engines. 
 
-User-defined engines are [npm](http://npmjs.org) modules that export a single function, which complies with the specification documented below. Their package.json files must have an entry called `sense`. There is a simple example engine to get you started in the examples folder. For real-life examples, see the [CoffeeScript](http://github.com/SensePlatform/CoffeeScriptEngine) and [JavaScript](http://github.com/SensePlatform/JavaScriptEngine) engines.
+User-defined engines are [npm](http://npmjs.org) modules that export a single function, which complies with the specification documented below. Their package.json files must have an entry called sense. There is a simple example engine to get you started in the examples folder. For real-life examples, see the [CoffeeScript](http://github.com/SensePlatform/CoffeeScriptEngine) and [JavaScript](http://github.com/SensePlatform/JavaScriptEngine) engines.
 
 To deploy a custom engine, simply stick it in `/home/sense/node_modules` in one of your projects. When you launch dashboards from that project in the future, the new engine will be available in the dashboard type menu.
 
@@ -45,7 +45,7 @@ It is important that none of these functions runs for a long time so that node.j
 
 The output method of the dashboard object can be called at any time to emit output from the dashboard. In particular, it allows the 'execute' function to output any result or error associated with a chunk of code. 
 
-The single argument of `dashboard.output` is an object of the form `{mime, data, input}`. The mime parameter gives the [MIME type](http://en.wikipedia.org/wiki/Mime_type) of the output, and the data parameter contains the payload, which is usually plain text but may be a JavaScript object. The `input` parameter indicates whether the payload is echoing input, such as code or comments. The currently supported MIME types are:
+The single argument of `dashboard.output` is an object of the form `{mime, data, input}`. The mime parameter gives the [MIME type](http://en.wikipedia.org/wiki/Mime_type) of the output, and the data parameter contains the payload, which is usually plain text but may be a JavaScript object. The input parameter indicates whether the payload is echoing input, such as code or comments. The currently supported MIME types are:
 
 * `text/plain`: Unformatted text.
 * `text/r`, `text/python`, `text/javascript`, etc.: Code that should be displayed with syntax highlighting.
