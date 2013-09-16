@@ -1,7 +1,7 @@
 {
   "name": "sense-engines",
   "description": "Utilities for constructing dashboards for the Sense platform.",
-  "version": "0.0.7",
+  "version": "0.1.0",
   "main": "./lib/index.js",
   "url": "http://www.senseplatform.com/",
   "license": "MIT",
