@@ -43,9 +43,9 @@ exports.createDashboard = function(dashboard) {
 
 It is important that none of these functions runs for a long time so that node.js is free to listen for incoming events. The execute function, in particular, should usually delegate to a separate thread or process.
 
-The `output` method of the dashboard object can be called at any time to emit output from the dashboard. In particular, it allows the 'execute' function to output any result or error associated with a chunk of code. 
+The output method of the dashboard object can be called at any time to emit output from the dashboard. In particular, it allows the 'execute' function to output any result or error associated with a chunk of code. 
 
-The single argument of `dashboard.output` is an object of the form `{mime, data, input}`. The `mime` parameter gives the [MIME type](http://en.wikipedia.org/wiki/Mime_type) of the output, and the `data` parameter contains the payload, which is usually plain text but may be a JavaScript object. The `input` parameter indicates whether the payload is echoing input, such as code or comments. The currently supported MIME types are:
+The single argument of `dashboard.output` is an object of the form `{mime, data, input}`. The mime parameter gives the [MIME type](http://en.wikipedia.org/wiki/Mime_type) of the output, and the data parameter contains the payload, which is usually plain text but may be a JavaScript object. The `input` parameter indicates whether the payload is echoing input, such as code or comments. The currently supported MIME types are:
 
 * `text/plain`: Unformatted text.
 * `text/r`, `text/python`, `text/javascript`, etc.: Code that should be displayed with syntax highlighting.
@@ -54,14 +54,14 @@ The single argument of `dashboard.output` is an object of the form `{mime, data,
 * `text/prompt`: A nonstandard dashboard prompt.
 * `text/html`: Arbitrary HTML that will be displayed in an iframe.
 * `application/javascript`: Arbitrary JavaScript code that will be run in the user's browser.
-* `application/error`: A custom MIME type for error messages. The `data` should be an object of the form `{message, details}` where `message` is 1-5 lines and `details` contains a stack trace or other detailed information.
-* `application/warning`: A custom MIME type for warnings. The `data` object should be of the same form as `application/error`'s.
-* `image/png`, `image/jpeg`, etc.: Images to be displayed in the dashboard. The `data` should be an object of the form {`src`, `height`, `width`}, where `src` is either a URL or a Base64-encoded string containing the image data.
+* `application/error`: A custom MIME type for error messages. The data should be an object of the form `{message, details}` where message is 1-5 lines and details contains a stack trace or other detailed information.
+* `application/warning`: A custom MIME type for warnings. The data object should be of the same form as `application/error`'s.
+* `image/png`, `image/jpeg`, etc.: Images to be displayed in the dashboard. The data should be an object of the form `{src, height, width}`, where src is either a URL or a Base64-encoded string containing the image data.
 
 
-### The `sense` entry in package.json
+### The sense field in package.json
 
-The `sense` entry signals that your module is in fact an engine, tells the UI what name to give it in the dashboard types menu, tells it how to highlight code typed into the dashboard, etc. For example:
+The sense field signals that your module is in fact an engine, tells the UI what name to give it in the dashboard types menu, tells it how to highlight code typed into the dashboard, etc. For example:
 
 ```JavaScript
 {
