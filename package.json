@@ -9,5 +9,8 @@
   "dependencies": {
     "optimist": "~0.5.2",
     "lodash": "~2.0.0"
+  },
+  "bin": {
+    "sense-engine": "./bin/sense-engine"
   }
 }

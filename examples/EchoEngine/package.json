@@ -1,0 +1,17 @@
+{
+  "name": "echo-engine",
+  "description": "Simple echo engine for Sense.",
+  "version": "0.1.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "sense-engine": "~0.1.0"
+  },
+  "bin": {
+    "echo-engine": "./bin/echo-engine"
+  },
+  "sense": {
+    "name": "Echo",
+    "mode": "text/plain"
+  }
+}

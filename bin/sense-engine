@@ -1,0 +1,3 @@
+#!/usr/bin/env node
+var engine = require('../lib')();
+engine.repl().ready();

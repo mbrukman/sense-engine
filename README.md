@@ -1,17 +1,63 @@
-## Sense Platform engine creation utilities
+# Sense Engine API
 
-This package gives you everything you need to run your favorite programming language or console-based application as an engine on [the Sense Platform](http://www.senseplatform.com)'s cloud infrastructure, using the same user interface as the official engines. 
+This module gives you everything you need to run your favorite programming language or console-based 
+application as an engine on [Sense's](https://senseplatform.com) cloud infrastructure.  By building
+on Sense, you automatically get a scalable cloud compute infrastructure, a beautiful user interface, 
+and a powerful REST API for your engine.
 
-User-defined engines are [npm](http://npmjs.org) modules that export a single function, which complies with the specification documented below. Their package.json files must have an entry called `sense`. There is a simple example engine to get you started in the examples folder. For real-life examples, see the [CoffeeScript](http://github.com/SensePlatform/CoffeeScriptEngine) and [JavaScript](http://github.com/SensePlatform/JavaScriptEngine) engines.
+![Sense Engine](http://i.imgur.com/5AMnsSS.png)
 
-To deploy a custom engine, simply stick it in `/home/sense/node_modules` in one of your projects. When you launch dashboards from that project in the future, the new engine will be available in the dashboard type menu.
+Sense includes built in support for R, Python, and JavaScript.
 
-### The exported function
+## Building Engines
 
-Your module should export a function of a single argument called `createDashboard`. The argument will be a dashboard instance, and the function should add the following attributes to it:
+Sense uses NodeJS's [NPM](https://npmjs.org/) modules to provide a standard interface and isolated installation
+mechanism for engines.  To build and engine you simply must define a NPM module that:
 
-```JavaScript
-exports.createDashboard = function(dashboard) {
+1. exports a `createEngine` function
+2. includes a `sense` entry in its `package.json` file.
+
+There is a simple example engine to get you started in the `examples` folder. For a real example,
+see Sense's [JavaScript](http://github.com/SensePlatform/JavaScriptEngine) engine.
+
+## Installing Engines
+
+To install a custom engine on Sense, simply `npm install` it into one of your projects.
+When you launch a dashboards from that project in the future, the new engine options will 
+be available in the engine menu.
+
+# TODO: UPDATE THESE DOCS
+
+## API
+
+Your module should export a function of a single argument called `createEngine`. The argument will be
+a engine instance, and the function should implement the following methods on it:
+
+```javascript
+exports.createEngine = function(dashboard) {
+ 
+  // This function is called when users click interrupt.
+  dashboard.interrupt = function() {
+    console.log('Interrupt received.');
+  };
+
+  // This function is responsible for sending code to the echoing the code,
+  // then notifying the dashboard that the next command can be sent in.
+  dashboard.execute = function(code, next) {
+    dashboard.code(code, 'text');
+    dashboard.text(code);
+    next();
+  };
+
+  // This extremely simple chunker just splits the input up into lines.
+  dashboard.chunk = function(code, cb) {
+    cb(code.split('\n'));
+  };
+
+  dashboard.ready();
+};
+
+  return echoEngine;
 
   dashboard.complete = function(codeString, cb) {
     // Passes an array of completions to the callback.
