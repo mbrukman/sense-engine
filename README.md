@@ -14,13 +14,13 @@ Sense includes built in support for R, Python, and JavaScript.
 ## Building Engines
 
 Sense uses NodeJS's [NPM](https://npmjs.org/) modules to provide a standard interface and isolated installation
-mechanism for engines.  To build and engine you simply must define a NPM module that:
+mechanism for engines.  To build and engine you must define an NPM module that:
 
 1. exports a `createEngine` function
 2. includes a `sense` entry in its `package.json` file.
 
 There is a simple example engine to get you started in the `examples` folder. For a real example,
-see Sense's [JavaScript](http://github.com/SensePlatform/JavaScriptEngine) engine.
+see Sense's [JavaScript](http://github.com/SensePlatform/sense-js-engine) engine.
 
 ## Installing Engines
 
@@ -28,104 +28,85 @@ To install a custom engine on Sense, simply `npm install` it into one of your pr
 When you launch a dashboards from that project in the future, the new engine options will 
 be available in the engine menu.
 
-# TODO: UPDATE THESE DOCS
-
 ## API
 
-Your module should export a function of a single argument called `createEngine`. The argument will be
-a engine instance, and the function should implement the following methods on it:
+Your module should export a function called `createEngine`. It should first create an engine by calling this module's exported function, add a few methods to it, call its `ready` method, and return it:
 
 ```javascript
-exports.createEngine = function(dashboard) {
+exports.createEngine = function() {
+  var engine = require('sense-engine')();
  
-  // This function is called when users click interrupt.
-  dashboard.interrupt = function() {
-    console.log('Interrupt received.');
-  };
+  engine.interrupt = function() {
+    // This is called when users click 'interrupt'. It returns nothing, but
+    // interrupts the engine somehow. This is often accomplished by running 
+    // the engine in a process and using worker_process.kill('SIGINT').
+  }
 
-  // This function is responsible for sending code to the echoing the code,
-  // then notifying the dashboard that the next command can be sent in.
-  dashboard.execute = function(code, next) {
-    dashboard.code(code, 'text');
-    dashboard.text(code);
+  engine.execute = function(code, next) {
+    // This function is responsible for echoing the code to the dashboard,
+    // sending the code to the engine, then notifying the dashboard when
+    // processing is complete and next command can be sent in.
+    //
+    // First, echo the code back to the dashboard. 
+    // Add the language name for syntax highlighting.
+    engine.code(code, 'language-name');
+    
+    // The real work is done here; run the code in the engine and produce
+    // a text or html representation of the result.
+    var result = // ...
+    
+    engine.text(result); // or engine.html(result) for html output
     next();
   };
 
-  // This extremely simple chunker just splits the input up into lines.
-  dashboard.chunk = function(code, cb) {
+  engine.chunk = function(code, cb) {
+    // Your engine needs a 'chunker', a function that takes a string of code
+    // and passes to a callback an array of strings, where each element is a 
+    // complete statement, block comment, or other complete code unit. These 
+    // chunks will be sent to dashboard.execute one at a time.
+    //
+    // This extremely simple example chunker just splits the input up into 
+    // lines.
+
     cb(code.split('\n'));
   };
 
-  dashboard.ready();
-};
+  // This method call lets the dashboard know that the engine is ready to 
+  // take input. You can call it from a callback if you need to wait for
+  // some event in a worker process.
+  engine.ready();
 
-  return echoEngine;
-
-  dashboard.complete = function(codeString, cb) {
-    // Passes an array of completions to the callback.
-  }
-
-  dashboard.chunk = function(codeString, cb) {
-    // Splits the code up into chunks, which may be statements, 
-    // comments, etc. puts them in an array, and passes them to 
-    // the callback. These chunks will be sent to dashboard.execute 
-    // one at a time.
-  }
-
-  dashboard.interrupt = function() {
-    // Returns nothing, but interrupts the dashboard somehow. This is 
-    // often accomplished by running the dashboard in a worker and using 
-    // worker.kill 'SIGINT'.
-  }
-
-  dashboard.execute = function(chunk, next) {
-    // This function should send one chunk output by dashboard.chunk
-    // to the dashboard's engine for execution, and should call 'next' 
-    // once the execution is complete and any result has been passed 
-    // to one of the output methods documented below. 'next' can be 
-    // called from a callback if that is easier. This function can
-    // return before 'next' is called.
-  }
-
+  return engine;
 };
 ```
 
-It is important that none of these functions runs for a long time so that node.js is free to listen for incoming events. The execute function, in particular, should usually delegate to a separate thread or process.
+It is important that none of these methods runs for a long time so that Node.js is free to listen for incoming events. The execute method, in particular, should usually delegate to a separate thread or process.
 
-The following output methods of the dashboard object can be called at any time to emit output from the dashboard. In particular, they allow the 'execute' function to output any result or error associated with a chunk of code.
+The following output methods of the engine can be called at any time to emit output to the dashboard. In particular, they allow the 'execute' function to output any result or error associated with a chunk of code.
 
 ```JavaScript
-// Display the string as plain text output.
-dashboard.text(string)
+// Display a string as plain text.
+engine.text(string)
 
-// This string is a chunk of code that was passed into the 
-// dashboard. Echo it as syntax-highlighted text.
-dashboard.code(string)
+// Display a string as syntax-highlighted code.
+engine.code(string, languageName)
 
-// Display the string as an error.
-dashboard.error(string)
+// Display an error message. If available, `details` can contain a stack 
+// trace or other multi-line information about the error.
+dashboard.error(message, details)
 
-// Display the string as a warning.
-dashboard.warning(string)
-
-// The string is a comment chunk that was passed into the 
-// dashboard. Display it as comment-colored text.
+// Display a string as light-colored text. Be sure to strip leading comment
+// tokens like # or // from the string first.
 dashboard.comment(string)
 
-// The string is HTML that was generated by compiling Markdown.
-// Display it as such.
+// Render a Markdown string to HTML and display it.
 dashboard.markdown(string)
 
-// The string is a nonstandard prompt that the dashboard has 
-// presented.
+// Set the dashboard prompt to something nonstandard.
 dashboard.prompt(string)
 
-// The string is HTML and should be displayed as such.
+// Display an arbitrary HTML element in the dashboard.
 dashboard.html(string)
-
-// The string is a JavaScript widget that should be embedded in
-// the output.
-dashboard.widget(string)
 ```
 
 ### The `sense` entry in package.json
@@ -148,17 +129,17 @@ The `sense` entry signals that your module is in fact an engine, tells the UI wh
 
 If your engine fails to launch a dashboard on Sense, we'll do our best to report the error to you; but it's much easier to run your engine as a command line-based repl while developing and testing it, and then deploy to Sense after you're pretty sure it works.
 
-To do this, pass the name of your module to the `sense-repl` binary. You can give it the `--pretty` option to format the output nicely and/or a `--startupScript` option, which is the name of a file containing code. The dashboard will execute the file's contents before taking any more input. 
+To do this, run your module's `createEngine` function and call the engine object's `repl` method. 
 
 In the repl, you can switch into multiline mode by pressing ctrl-v. In multiline mode, the repl will accumulate the code you type or paste in until it sees a blank line.
 
 ### Testing with Mocha or another unit testing framework
 
-To help you write unit tests for your engine, this module exports a function called `test` that turns the engine into a function that takes input and passes all resulting output to a callback. 
+To help you write unit tests for your engine, it has a method called `test` that returns a function which takes input and passes all resulting output to a callback. 
 
 ```JavaScript
-require('sense-dashboard').test(dashboardModule.createDashboard, function(tester) {
-  var input = "console.log('hi')"
+require('engine-module').createDashboard().test(function(tester) {
+  var input = "console.log('hello')"
   tester(input, function(output) {
     // Output should be a code cell followed by a text cell. 
     // Put code here to verify that.
@@ -166,7 +147,7 @@ require('sense-dashboard').test(dashboardModule.createDashboard, function(tester
 });
 ```
 
-The tester function is delivered to a callback rather than returned because dashboard startup is usually asynchronous. However, you can use Mocha to [sequence asynchronous tests](http://visionmedia.github.io/mocha/#asynchronous-code). See the test folders in [these](http://github.com/SensePlatform/CoffeeScriptEngine) [two](http://github.com/SensePlatform/JavaScriptEngine) engines.
+The tester function is delivered to a callback rather than returned because dashboard startup is usually asynchronous. However, you can use Mocha to [sequence asynchronous tests](http://visionmedia.github.io/mocha/#asynchronous-code). See the test folders in [this](http://github.com/SensePlatform/sense-js-engines) engines.
 
 ## Support
 
