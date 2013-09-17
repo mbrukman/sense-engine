@@ -1,5 +1,7 @@
 # Sense Engine API
 
+[![Build Status](https://travis-ci.org/SensePlatform/sense-engine.png)](https://travis-ci.org/SensePlatform/sense-engine)
+
 This module gives you everything you need to run your favorite programming language or console-based 
 application as an engine on [Sense's](https://senseplatform.com) cloud infrastructure.  By building
 on Sense, you automatically get a scalable cloud compute infrastructure, a beautiful user interface, 
