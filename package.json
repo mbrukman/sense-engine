@@ -1,13 +1,11 @@
 {
   "name": "sense-engine",
-  "description": "Utilities for constructing dashboards for the Sense platform.",
+  "description": "Base implementation of Sense's Engine API.",
   "version": "0.1.0",
   "main": "./lib/index.js",
   "url": "https://senseplatform.com/",
   "license": "MIT",
-  "bin": {
-    "sense-repl": "bin/sense-repl"
-  },
+  "copyright": "Sense Inc",
   "dependencies": {
     "optimist": "~0.5.2",
     "lodash": "~2.0.0"
