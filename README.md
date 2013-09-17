@@ -167,3 +167,11 @@ require('sense-dashboard').test(dashboardModule.createDashboard, function(tester
 ```
 
 The tester function is delivered to a callback rather than returned because dashboard startup is usually asynchronous. However, you can use Mocha to [sequence asynchronous tests](http://visionmedia.github.io/mocha/#asynchronous-code). See the test folders in [these](http://github.com/SensePlatform/CoffeeScriptEngine) [two](http://github.com/SensePlatform/JavaScriptEngine) engines.
+
+## Support
+
+Let's make Sense awesome.  Need help?  Get in touch.
+
+* Email: support@senseplatform.com
+* Google Group: https://groups.google.com/forum/?fromgroups#!forum/sense-users
+* IRC: `#senseplatform` on `irc.freenode.net`
