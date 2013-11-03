@@ -1,7 +1,7 @@
 {
   "name": "sense-engine",
   "description": "Base implementation of Sense's Engine API.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "./lib/index.js",
   "url": "https://senseplatform.com/",
   "repository": "https://github.com/SensePlatform/sense-engine",
