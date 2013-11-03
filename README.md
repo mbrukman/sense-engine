@@ -7,7 +7,7 @@ application as an engine on [Sense's](https://senseplatform.com) cloud infrastru
 on Sense, you automatically get a scalable cloud compute infrastructure, a beautiful user interface, 
 and a powerful REST API for your engine.
 
-![Sense Engine](http://i.imgur.com/5AMnsSS.png)
+![Sense R Engine](https://s3.amazonaws.com/sense-files/rscreenshot.png)
 
 Sense includes built in support for R, Python, and JavaScript.
 
