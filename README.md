@@ -15,29 +15,28 @@ Sense includes built in support for R, Python, and [JavaScript](https://github.c
 
 ## Writing a New Engine
 
-Sense uses NodeJS's [NPM](https://npmjs.org/) modules to provide a
-standard interface and isolated installation mechanism for engines.
+Sense uses NodeJS's [NPM](https://npmjs.org/) modules as a
+standard interface and isolated installation mechanism for engines.  If you're
+familiar with NodeJS modules, writing an engine for Sense is simple.
 
-Writing a new engine for Sense is simple.  All you need to do is 
-implement the basic Engine API below and include a `sense` entry in the
-modules `package.json` file that defines a few things like the appropriate
-syntax highlighting. 
-
-There is a trivial example engine to get you started in the `examples`
-folder. For a real example, see Sense's
+Engines just implement a basic Engine API and include a `sense` entry in the
+modules `package.json`. Full details are below.  There's also is a simple example
+to get you started in the `examples` folder. For a real example, see Sense's
 [JavaScript](http://github.com/SensePlatform/sense-js-engine) engine.
 
 ## Installing a New Engine
 
-To install a custom engine on Sense, simply run `npm install new-engine-name` in
-one of your projects. This will install the engine locally in the project's
-`node_modules` folder.  When you launch a dashboard from that project in
-the future, the new engine options will be available in the engine list.
+Installing an engine is Sense is just like installing an NPM package.  Simply run
+`npm install new-engine-name` in one of your projects. This will install the engine 
+locally in the project's `node_modules` folder.
+
+When you launch a dashboard from that project in the future, the new engine 
+will automatically appear in the engine list.
 
 ![Engine List](https://sense.global.ssl.fastly.net/assets/c48e701f-screenshot-new.png)
 
 Since engines are installed locally, you can be confident that your project will always
-work.
+work even if you use a different version of the engine on a different project.
 
 ## Engine API
 
