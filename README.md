@@ -2,32 +2,33 @@
 
 [![Build Status](https://travis-ci.org/SensePlatform/sense-engine.png)](https://travis-ci.org/SensePlatform/sense-engine)
 
-[Sense](https://senseplatform.com) is a collaborative cloud platform for data science that makes it radically easier to build,
-scale, and deploy data analysis and big data analytics projects, regardless of the 
-tools you use.  Sense has built in support for R, Python, and JavaScript, but can be extended
-to any interactive tool such as a language like [Julia](http://julialang.org/)
-or cluster computing framework like  [Spark](http://spark.incubator.apache.org/).  Once built, engines
-can be installed by any user.  We expect more official engines to supported as Sense develops.
+[Sense](https://senseplatform.com) is a collaborative cloud platform for data science that makes
+it radically easier to build, scale, and deploy data analysis and big data analytics projects, 
+regardless of the  tools you use.  Sense has built in support for R, Python, and JavaScript,
+but can be extended to any interactive tool such as a language like [Julia](http://julialang.org/)
+or cluster computing framework like  [Spark](http://spark.incubator.apache.org/).
 
-This module gives you everything you need to build an Sense engine for favorite programming language or interactive 
-data analysis tool. By building on Sense, you automatically get a eautiful cloud user interface, 
-shared project filestem, private project network, autoprovisioning pool of workers,
-exported jobs, and powerful REST API. 
-
-Sense allows you to focus on the core of your engine and get all the rest for free.  Users benefit from the same
-highly productive experience and workflow across engines.
+This module gives you everything you need to build an Sense engine for favorite programming language
+or interactive  data analysis tool. By building on Sense, you automatically get a eautiful cloud
+user interface,  shared project filestem, private project network, autoprovisioning pool of workers,
+exported jobs, and powerful REST API.  Sense allows you to focus on the core of your engine 
+and get all the rest for free.  Users benefit from the same highly productive experience 
+and workflow across engines.
 
 ![Sense R Engine](https://s3.amazonaws.com/sense-files/rscreenshot.png)
+
+
+We're just getting started.  Expect engines to get even more powerful soon.
 
 ## Writing a New Engine
 
 Sense uses NodeJS's [NPM](https://npmjs.org/) modules as a
 standard interface and isolated installation mechanism for engines.  If you're
-familiar with NodeJS modules, writing an engine for Sense is simple.
+familiar with (NodeJS)[http://nodejs.org/] modules, writing an engine for Sense is simple.
 
-Engines just implement a basic Engine API and include a `sense` entry in the
+Engines implement a basic Engine API and include a `sense` entry in the
 modules `package.json` file. Full details are below.  The `examples` folder includes a simple
-engine to get you started. For a more complete example, see Sense's
+example to get you started. For a more complete example, see Sense's
 [JavaScript](http://github.com/SensePlatform/sense-js-engine) engine.
 
 ## Installing a New Engine
@@ -38,22 +39,24 @@ Installing an new engine in Sense is just like installing a NPM package. Run
 npm install new-engine-name
 ```
 
-in one of your projects. This will install the engine locally in the project's `node_modules`
-folder. When you launch a dashboard from that project in the future, the new engine 
+in one of your projects. This will install the engine locally in the project's `/home/sense/node_modules`
+folder. When you launch a new dashboard from that project in the future, the installed engine 
 will appear automatically in the engine list.
 
 ![Engine List](https://sense.global.ssl.fastly.net/assets/c48e701f-screenshot-new.png)
 
 Since engines are installed locally, you can be confident that your project will always
 work even if you use a different version of the engine on a different project.  Sense
-is designed for rock solid deployment.
+is designed for projects to be fully reproducible and easily deployable.
 
 ## Engine API
 
 Engines are modules that export a `createEngine` function that returns an engine
 implementation.  When you launch a dashboard, this engine function will be called
 and Sense will hook the engine into the entire cloud infastructure.  You can then
-interact with the engine the same way to do with Sense's builtin engines.
+interact with the engine the same way you do with Sense's built in engines, either interactively
+in a dashboards, through an [exported job](http://help.senseplatform.com/getting-started#jobs), 
+or via Sense's [REST API](http://help.senseplatform.com/api/rest).
 
 ### Basic Engine Implementation
 
@@ -149,25 +152,23 @@ engine.prompt(string)
 engine.html(string)
 ```
 
-Output can include arbitrary HTML, including JavaScript.  All dashboard output is 
+Output can include arbitrary HTML, including JavaScript.  For security, dashboards are 
 sandboxed within an iframe on different domain than senseplatform.com.
 
 ### Best Practices
 
-* It is important that none of engine methods runs for a long time so
-  that NodeJS is free to listen for incoming events. The execute
+* Don't block the event loop for a long time so that NodeJS is free to listen for incoming events. The execute
   method, in particular, should usually delegate to a [child process](http://nodejs.org/api/child_process.html).
+* Hide output on assignment to avoiding cluttering the dashboard.
+* Render block comments as markdown.
 * Implement a rich display system so that a bare object at the command prompt
   displays a rich representation by default.  See the JavaScript engine for an example.
 * Expose the engine ouput functions to users within the engine via a library.
-* Hide output on assignment to avoiding cluttering the dashboard.
-* Render block comments as markdown.
-
 
 ## The package.json File
 
 Sense engines must have a `sense` entry in their `package.json` file to signal that
-the module is in fact an engine.  This entry also tells the UI what name to give it
+the module is in fact an engine.  This entry also tells the UI what name to give the engine
 in the engine list, how to highlight code typed into the editor, how to comment out lines of
 code in the editor, and what file extensions the engine can execute.
 
@@ -191,11 +192,11 @@ A basic `package.json` file might look like:
 
 If your engine fails to launch on Sense, we'll do our best
 to report the error to you; but it's sometimes easier to run your engine as
-a command line REPL while developing, and then
-deploy to Sense after you're pretty sure it works.
+a command line REPL while developing, and then deploy to Sense after you're pretty 
+sure it works correctly.
 
-To make local testing easy, engines have a `repl` function that implements a console
-based REPL.  To create a REPL for your engine, simply create a script such as 
+To make local testing easy, engines have a `repl` function that creates a console-based
+REPL.  To create a REPL for your engine, simply create a script such as 
 `bin/new-engine-name` with:
 
 ```
@@ -203,7 +204,7 @@ based REPL.  To create a REPL for your engine, simply create a script such as
 require('../').createEngine().repl();
 ```
 
-You can run the REPL using ` `bin/new-engine-name`.  Within the REPL, you can switch 
+You can run the REPL using `bin/new-engine-name`.  Within the REPL, you can switch 
 into multiline mode by pressing ctrl-v. In multiline mode, the repl will accumulate 
 the code you type or paste in until it sees a blank line.
 
@@ -223,11 +224,10 @@ require('new-engine-name').createEngine().test(function(tester) {
 ```
 
 The `tester` function is delivered to a callback rather than returned
-because dashboard startup is usually asynchronous. You can use this function with your
-favorite NodeJS testing library, for instance using [Mocha](http://visionmedia.github.io/mocha/)
- to [sequence asynchronous tests](http://visionmedia.github.io/mocha/#asynchronous-code). See the
-test folder in the [JavaScript](http://github.com/SensePlatform/sense-js-
-engines) engines for an example.
+because engine startup is usually asynchronous. You can use this function with your
+favorite NodeJS testing library. The [JavaScript](http://github.com/SensePlatform/sense-js-
+engines) engine uses [Mocha](http://visionmedia.github.io/mocha/)
+to [sequence asynchronous tests](http://visionmedia.github.io/mocha/#asynchronous-code).
 
 ## Support
 
