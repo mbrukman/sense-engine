@@ -10,6 +10,7 @@ infrastructure, a beautiful user interface,  and a powerful REST API
 for your engine.
 
 ![Sense R Engine](https://s3.amazonaws.com/sense-files/rscreenshot.png)
+-> Sense R Engine <-
 
 Sense includes built in support for R, Python, and [JavaScript](https://github.com/SensePlatform/sense-js-engine).
 
@@ -37,6 +38,7 @@ folder. When you launch a dashboard from that project in the future, the new eng
 will appear automatically in the engine list.
 
 ![Engine List](https://sense.global.ssl.fastly.net/assets/c48e701f-screenshot-new.png)
+-> Engine List <-
 
 Since engines are installed locally, you can be confident that your project will always
 work even if you use a different version of the engine on a different project.  Sense
