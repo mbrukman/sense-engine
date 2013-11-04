@@ -9,8 +9,8 @@ but can be extended to any interactive tool such as a language like [Julia](http
 or cluster computing framework like  [Spark](http://spark.incubator.apache.org/).
 
 This module gives you everything you need to build an Sense engine for favorite programming language
-or interactive  data analysis tool. By building on Sense, you automatically get a eautiful cloud
-user interface,  shared project filestem, private project network, autoprovisioning pool of workers,
+or interactive  data analysis tool. By building on Sense, you automatically get a beautiful cloud
+user interface, shared project filestem, private project network, autoprovisioning worker engines,
 exported jobs, and powerful REST API.  Sense allows you to focus on the core of your engine 
 and get all the rest for free.  Users benefit from the same highly productive experience 
 and workflow across engines.
