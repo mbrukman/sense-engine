@@ -2,9 +2,12 @@
 
 [![Build Status](https://travis-ci.org/SensePlatform/sense-engine.png)](https://travis-ci.org/SensePlatform/sense-engine)
 
-This module gives you everything you need to run your favorite
-programming language or console-based  application as an engine on
-[Sense's](https://senseplatform.com) cloud infrastructure.  By
+Sense is a cloud platform for data science that makes it radically easier to build,
+scale, and deploy data analysis and big data analytics projects, regardless of the 
+tools.  Sense includes support for R, Python, and JavaScript, but supports any engine. 
+
+This module gives you everything you need to run your favorite programming language or interactive 
+data analysis tool as an engine on [Sense's](https://senseplatform.com) cloud infrastructure.  By
 building on Sense, you automatically get a scalable cloud compute
 infrastructure, a beautiful user interface,  and a powerful REST API
 for your engine.
