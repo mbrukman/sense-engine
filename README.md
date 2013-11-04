@@ -24,7 +24,7 @@ We're just getting started.  Expect engines to get even more powerful.
 
 Sense uses NodeJS's [NPM](https://npmjs.org/) modules as a
 standard interface and isolated installation mechanism for engines.  If you're
-familiar with (NodeJS)[http://nodejs.org/] modules, writing an engine for Sense is simple.
+familiar with [NodeJS](http://nodejs.org/) modules, writing an engine for Sense is simple.
 
 Engines implement a basic Engine API and include a `sense` entry in the
 modules `package.json` file. Full details are below.  The `examples` folder includes a simple
