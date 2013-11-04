@@ -26,43 +26,48 @@ engine to get you started. For a more complete example, see Sense's
 
 ## Installing a New Engine
 
-Installing an engine is Sense is just like installing an NPM package.  Simply run
-`npm install new-engine-name` in one of your projects. This will install the engine 
-locally in the project's `node_modules` folder.
+Installing an new engine in Sense is just like installing a NPM package. Run
 
-When you launch a dashboard from that project in the future, the new engine 
-will automatically appear in the engine list.
+```
+npm install new-engine-name
+```
+
+in one of your projects. This will install the engine locally in the project's `node_modules`
+folder. When you launch a dashboard from that project in the future, the new engine 
+will appear automatically in the engine list.
 
 ![Engine List](https://sense.global.ssl.fastly.net/assets/c48e701f-screenshot-new.png)
 
 Since engines are installed locally, you can be confident that your project will always
-work even if you use a different version of the engine on a different project.
+work even if you use a different version of the engine on a different project.  Sense
+is designed for rock solid deployment.
 
 ## Engine API
 
 Engines are modules that export a `createEngine` function that returns an engine
 implementation.  When you launch a dashboard, this engine function will be called
-and Sense will hook the engine into the entire cloud infastructure without any
-extra work required.
+and Sense will hook the engine into the entire cloud infastructure.  You can then
+interact with the engine the same way to do with Sense's builtin engines.
 
 ### Basic Engine Implementation
 
 ```javascript
 exports.createEngine = function() {
   
-  // Create a base engine implementation using this module.
+  // Create a base engine instance using this module.
   var engine = require('sense-engine')();
  
   engine.interrupt = function() {
     // Implement interrupt behavior to handle when users click 'interrupt'.
-    // Interrupting is often accomplished by running the engine in a process 
-    // and using worker_process.kill('SIGINT').
+    // Interrupting is often accomplished by running the engine in a child process 
+    // and using workerProcess.kill('SIGINT').
   }
 
   engine.execute = function(code, next) {
-
+    // Execute code and display the results.
+    //
     // This function is responsible for echoing the code to the dashboard,
-    // sending the code to the engine, then notifying the dashboard when
+    // sending the code to the engine, and then notifying the dashboard when
     // processing is complete and next command can be sent in.
     //
     // First, echo the code back to the dashboard. Add the language name for 
@@ -71,17 +76,18 @@ exports.createEngine = function() {
     
     // The real work is done here; run the code in the engine and produce
     // a text or html representation of the result.
-    var result = // ...
-
+    var result = (your engine evaluation logic)
     engine.text(result); // or engine.html(result) for html output
 
-    // Call next when the engine is ready for the next command.  This
+    // Ask for the next code chunk with next.  This
     // allows for asyncronous execution of code.
     next();
   };
 
   engine.chunk = function(code, cb) {
-    // Your engine needs a 'chunker', a function that takes a string of code
+    // Chunk code into pieces that can be executed in order.
+    //
+    // The chunker function that takes a string of code
     // and passes to a callback an array of strings, where each element is a 
     // complete statement, block comment, or other complete code unit. These 
     // chunks will be sent to dashboard.execute one at a time.
@@ -93,8 +99,8 @@ exports.createEngine = function() {
     cb(code.split('\n'));
   };
 
-  // Call engine.ready() when the dashboard if first ready to 
-  // take input. You can call it from a callback if you need to wait for
+  // Call engine.ready() when the dashboard is first ready to 
+  // take input. You can call ready from a callback if you need to wait for
   // some event in a worker process.
   engine.ready();
 
@@ -102,12 +108,6 @@ exports.createEngine = function() {
   return engine;
 };
 ```
-
-### Avoid Blocking the Event Loop
-
-It is important that none of engine methods runs for a long time so
-that NodeJS is free to listen for incoming events. The execute
-method, in particular, should usually delegate to a [child process](http://nodejs.org/api/child_process.html).
 
 ### Output API
 
@@ -138,61 +138,71 @@ engine.markdown(string)
 // Set the dashboard prompt to something nonstandard.
 engine.prompt(string)
 
-// Display an arbitrary HTML element in the dashboard.
+// Display an arbitrary HTML element in the dashboard. This is the most flexible.
+// 
 engine.html(string)
 ```
 
-### Conventions
+Output can include arbitrary HTML, including JavaScript.  All dashboard output is 
+sandboxed within an iframe on different domain than senseplatform.com.
 
+### Best Practices
+
+* It is important that none of engine methods runs for a long time so
+  that NodeJS is free to listen for incoming events. The execute
+  method, in particular, should usually delegate to a [child process](http://nodejs.org/api/child_process.html).
 * Implement a rich display system so that a bare object at the command prompt
-  displays a rich HTML representation.  See the JavaScript engine for an example.
-* Expose the engine ouput functions to users within the engine via a base library.
+  displays a rich representation by default.  See the JavaScript engine for an example.
+* Expose the engine ouput functions to users within the engine via a library.
 * Hide output on assignment to avoiding cluttering the dashboard.
 * Render block comments as markdown.
 
 
 ## The package.json File
 
-Sense engines must have a `sense` entry in the `package.json` file that signals that
-your module is in fact an engine.  This entry also tells the UI what name to give it
-in the engine list, how to highlight code typed into the dashboard, what file extensions
-the engine can execute, and defins . For example:
+Sense engines must have a `sense` entry in their `package.json` file to signal that
+the module is in fact an engine.  This entry also tells the UI what name to give it
+in the engine list, how to highlight code typed into the editor, how to comment out lines of
+code in the editor, and what file extensions the engine can execute.
+
+A basic `package.json` file might look like:
 
 ```JavaScript
 {
   "name": "new-engine-name",
   "version": 1.0.0,
   "sense": {
-    "name": "CustomDashboard",
-    "mode": "my-language",
-    "fileExtensions": ["cd", "custdash", "customdashboard"],
+    "name": "My Engine Name",
+    "mode": "my-engine-language",
+    "fileExtensions": ["cd", "custengine", "customengine"],
     "lineComment": "//",
     "blockComment": ["/*", "*/"],
   }
 }
 ```
 
-## Testing
+## Testing Your Engine
 
-If your engine fails to launch a dashboard on Sense, we'll do our best
+If your engine fails to launch on Sense, we'll do our best
 to report the error to you; but it's sometimes easier to run your engine as
-a command line-based repl while developing, and then
+a command line REPL while developing, and then
 deploy to Sense after you're pretty sure it works.
 
-The `repl` function is this module can help. To implement a console based REPL for 
-debugging, simply create a script such as `bin/new-engine-name` with:
+To make local testing easy, engines have a `repl` function that implements a console
+based REPL.  To create a REPL for your engine, simply create a script such as 
+`bin/new-engine-name` with:
 
 ```
 #!/usr/bin/env node
 require('../').createEngine().repl();
 ```
 
-In the repl, you can switch into multiline mode by pressing ctrl-v. In
-multiline mode, the repl will accumulate the code you type or paste in
-until it sees a blank line.
+You can run the REPL using ` `bin/new-engine-name`.  Within the REPL, you can switch 
+into multiline mode by pressing ctrl-v. In multiline mode, the repl will accumulate 
+the code you type or paste in until it sees a blank line.
 
-You may always want to write unit tests for your engine.  The module as a 
-function called `test` that returns a function which takes input and passes all
+You may also want to write unit tests for your engine.  Engines have a method called 
+`test` that returns a function `tester` which takes input and passes all
 resulting output to a callback.
 
 ```javascript
@@ -207,9 +217,9 @@ require('new-engine-name').createEngine().test(function(tester) {
 ```
 
 The `tester` function is delivered to a callback rather than returned
-because dashboard startup is usually asynchronous. However, you can
-use Mocha to [sequence asynchronous
-tests](http://visionmedia.github.io/mocha/#asynchronous-code). See the
+because dashboard startup is usually asynchronous. You can use this function with your
+favorite NodeJS testing library, for instance using [Mocha](http://visionmedia.github.io/mocha/)
+ to [sequence asynchronous tests](http://visionmedia.github.io/mocha/#asynchronous-code). See the
 test folder in the [JavaScript](http://github.com/SensePlatform/sense-js-
 engines) engines for an example.
 
