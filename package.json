@@ -1,6 +1,6 @@
 {
   "name": "sense-engine",
-  "description": "Base implementation of Sense's Engine API.",
+  "description": "Data Science Engine API for Sense.",
   "version": "0.2.0",
   "main": "./lib/index.js",
   "url": "https://senseplatform.com/",
