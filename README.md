@@ -2,16 +2,15 @@
 
 [![Build Status](https://travis-ci.org/SensePlatform/sense-engine.png)](https://travis-ci.org/SensePlatform/sense-engine)
 
-Sense is a collaborative cloud platform for data science that makes it radically easier to build,
+[Sense](https://senseplatform.com) is a collaborative cloud platform for data science that makes it radically easier to build,
 scale, and deploy data analysis and big data analytics projects, regardless of the 
 tools you use.  Sense has built in support for R, Python, and JavaScript, but can be extended
 to any interactive tool such as a language like [Julia](http://julialang.org/)
 or cluster computing framework like  [Spark](http://spark.incubator.apache.org/).  Once built, engines
 can be installed by any user.  We expect more official engines to supported as Sense develops.
 
-This module gives you everything you need to run your favorite programming language or interactive 
-data analysis tool as an engine on [Sense's](https://senseplatform.com) cloud infrastructure.  By
-building on Sense, you automatically get a scalable cloud compute
+This module gives you everything you need to build an Sense engine for favorite programming language or interactive 
+data analysis tool. By building on Sense, you automatically get a scalable cloud compute
 infrastructure, including a shared project filestem, a private project network, and autoprovisioning
 worker engines.  You also get an highly productive, interactive cloud user interface
 and a powerful REST API to automate your engine, all with no extra work.
