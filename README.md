@@ -14,8 +14,6 @@ for your engine.
 
 ![Sense R Engine](https://s3.amazonaws.com/sense-files/rscreenshot.png)
 
-Sense includes built in support for R, Python, and [JavaScript](https://github.com/SensePlatform/sense-js-engine).
-
 ## Writing a New Engine
 
 Sense uses NodeJS's [NPM](https://npmjs.org/) modules as a
