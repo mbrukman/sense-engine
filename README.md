@@ -10,10 +10,10 @@ or cluster computing framework like  [Spark](http://spark.incubator.apache.org/)
 
 This module gives you everything you need to build a Sense engine for your favorite programming language
 or interactive  data analysis tool. By building on Sense, you automatically get an interactive cloud
-user interface, shared project filestem, private project network, scalable pool of workers,
-job-based workflow, and powerful REST API.  As an engine developer, Sense allows you to focus on 
+user interface, scalable worker engines, shared project filestem, private project network, 
+interactive and job-based workflow, and powerful REST API.  Sense allows you to focus on 
 the core of your engine, while providing users a world class experience that 
-integrates with existing tools.
+seamlessly integrates with their full suite of data science tools.
 
 ![Sense R Engine](https://s3.amazonaws.com/sense-files/rscreenshot.png)
 
