@@ -5,7 +5,7 @@
 [Sense](https://senseplatform.com) is a collaborative cloud platform for data science that makes
 it radically easier to build, scale, and deploy data analysis and big data analytics projects, 
 regardless of the  tools you use.  Sense has built in support for R, Python, and JavaScript,
-but can be extended to any interactive tool such as a language like [Julia](http://julialang.org/)
+but can be extended to any interactive tool such as a new language like [Julia](http://julialang.org/)
 or cluster computing framework like  [Spark](http://spark.incubator.apache.org/).
 
 This module gives you everything you need to build an Sense engine for favorite programming language
