@@ -13,7 +13,7 @@ or interactive  data analysis tool. By building on Sense, you automatically get 
 user interface, scalable worker engines, shared project filestem, private project network, 
 interactive and job-based workflow, and powerful REST API.  Sense allows you to focus on 
 the core of your engine, while providing users a world class experience that 
-seamlessly integrates with their full suite of data science tools.
+seamlessly integrates with their other tools.
 
 ![Sense R Engine](https://s3.amazonaws.com/sense-files/rscreenshot.png)
 
