@@ -17,7 +17,7 @@ seamlessly integrates with their other tools.
 
 ![Sense R Engine](https://s3.amazonaws.com/sense-files/rscreenshot.png)
 
-We're just getting started.  If you're building an engine on Sense, contact us below.
+We're just getting started.  If you're building an engine on Sense, drop us a line, we'd love to help.
 
 ## Writing a New Engine
 
