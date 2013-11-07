@@ -17,11 +17,11 @@ seamlessly integrates with their other tools.
 
 ![Sense R Engine](https://s3.amazonaws.com/sense-files/rscreenshot.png)
 
-We're just getting started. If you're thing about building an engine, drop us a line and we'll help in any way we can.
+We're just getting started.  If you're building an engine on Sense, contact us below.
 
 ## Writing a New Engine
 
-Sense uses [NodeJS's](http://nodejs.org/) [NPM](https://npmjs.org/) modules as a
+Sense uses [NodeJS](http://nodejs.org/) [NPM](https://npmjs.org/) modules as a
 standard interface and isolated installation mechanism for engines.  If you're
 familiar with NodeJS, writing an engine for Sense should be simple.
 
