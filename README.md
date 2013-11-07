@@ -8,31 +8,31 @@ regardless of the  tools you use.  Sense has built in support for R, Python, and
 but can be extended to any interactive tool such as a new language like [Julia](http://julialang.org/)
 or cluster computing framework like  [Spark](http://spark.incubator.apache.org/).
 
-This module gives you everything you need to build an Sense engine for favorite programming language
-or interactive  data analysis tool. By building on Sense, you automatically get a beautiful cloud
-user interface, shared project filestem, private project network, autoprovisioning worker engines,
-exported jobs, and powerful REST API.  Sense allows you to focus on the core of your engine 
-and get all the rest for free.  Users benefit from the same highly productive experience 
-and workflow across engines.
+This module gives you everything you need to build a Sense engine for your favorite programming language
+or interactive  data analysis tool. By building on Sense, you automatically get an interactive cloud
+user interface, shared project filestem, private project network, scalable pool of workers,
+job-based workflow, and powerful REST API.  As an engine developer, Sense allows you to focus on 
+the core of your engine, while providing users a world class experience that 
+integrates with existing tools.
 
 ![Sense R Engine](https://s3.amazonaws.com/sense-files/rscreenshot.png)
 
-We're just getting started. If you're building an engine, drop us a line so we can help.
+We're just getting started. If you're thing about building an engine, drop us a line and we'll help in any way we can.
 
 ## Writing a New Engine
 
-Sense uses NodeJS's [NPM](https://npmjs.org/) modules as a
+Sense uses [NodeJS's](http://nodejs.org/) [NPM](https://npmjs.org/) modules as a
 standard interface and isolated installation mechanism for engines.  If you're
-familiar with [NodeJS](http://nodejs.org/) modules, writing an engine for Sense is simple.
+familiar with NodeJS, writing an engine for Sense should be simple.
 
 Engines implement a basic Engine API and include a `sense` entry in the
-modules `package.json` file. Full details are below.  The `examples` folder includes a simple
-example to get you started. For a more complete example, see Sense's
+modules `package.json` file. Full details are below.  The `examples` folder includes
+an echo engine to get you started. For a more complete example, see Sense's
 [JavaScript](http://github.com/SensePlatform/sense-js-engine) engine.
 
 ## Installing a New Engine
 
-Installing an new engine in Sense is just like installing a NPM package. Run
+Installing a new engine in Sense is just like installing a NPM package. Run
 
 ```
 npm install new-engine-name
@@ -46,15 +46,15 @@ will appear automatically in the engine list.
 
 Since engines are installed locally, you can be confident that your project will always
 work even if you use a different version of the engine on a different project.  Sense
-is designed for projects to be fully reproducible and easily deployable.
+is designed for stable and reproducible deployment.
 
 ## Engine API
 
 Engines are modules that export a `createEngine` function that returns an engine
 implementation.  When you launch a dashboard, this engine function will be called
-and Sense will hook the engine into the entire cloud infastructure.  You can then
-interact with the engine the same way you do with Sense's built in engines, either interactively
-in a dashboards, through an [exported job](http://help.senseplatform.com/getting-started#jobs), 
+and hook the engine into Sense's entire cloud infastructure.  You can then
+interact with the engine the same way you do with Sense's built in engines: interactively
+in a dashboard, through an [exported job](http://help.senseplatform.com/getting-started#jobs), 
 or via Sense's [REST API](http://help.senseplatform.com/api/rest).
 
 ### Basic Engine Implementation
@@ -119,6 +119,7 @@ exports.createEngine = function() {
 
 ### Output API
 
+On Sense, engines can output anything from plain text to rich interactive widgets.
 The following output methods of the engine can be called at any time
 to emit output to the dashboard. In particular, they allow the
 `execute` function to output any result or error associated with a
@@ -156,7 +157,7 @@ sandboxed within an iframe on different domain than senseplatform.com.
 
 ### Best Practices
 
-* Don't block the event loop for a long time so that NodeJS is free to listen for incoming events. The execute
+* Don't block the event loop for a long time so that the engine is free to listen for incoming events. The execute
   method, in particular, should usually delegate to a [child process](http://nodejs.org/api/child_process.html).
 * Hide output on assignment to avoiding cluttering the dashboard.
 * Render block comments as markdown.
