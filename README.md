@@ -17,8 +17,7 @@ and workflow across engines.
 
 ![Sense R Engine](https://s3.amazonaws.com/sense-files/rscreenshot.png)
 
-
-We're just getting started.  Expect engines to get even more powerful.
+We're just getting started. If you're building an engine, drop us a line so we can help.
 
 ## Writing a New Engine
 
