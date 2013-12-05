@@ -137,6 +137,9 @@ engine.code(string, languageName)
 // trace or other multi-line information about the error.
 engine.error(message, details)
 
+// Display a warning message.
+engine.warning(message, details)
+
 // Display a string as light-colored text. Be sure to strip leading comment
 // tokens like # or // from the string first.
 engine.comment(string)
