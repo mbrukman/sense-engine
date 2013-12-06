@@ -144,19 +144,37 @@ engine.warning(message, details)
 // tokens like # or // from the string first.
 engine.comment(string)
 
+// Display a HTML output as help.
+engine.help(string)
+
 // Render a Markdown string to HTML and display it.
 engine.markdown(string)
 
 // Set the dashboard prompt to something nonstandard.
 engine.prompt(string)
 
-// Display an arbitrary HTML element in the dashboard. This is the most flexible.
-// 
-engine.html(string)
+// Display an image. "src" should be a valid value for an
+// html image tag. If it is a url, it must be https, not
+// plain http.
+engine.image({
+  src,
+  width,
+  height,
+  alt,
+  title
+})
+
+// Display arbitrary HTML in an IFrame. Provide src or srcdoc,
+// not both.
+engine.iframe({
+  src,
+  srcdoc,
+  width,
+  height
+})
 ```
 
-Output can include arbitrary HTML, including JavaScript.  For security, dashboards are 
-sandboxed within an iframe on different domain than senseplatform.com.
+IFrame output can include arbitrary HTML, including JavaScript.
 
 ### Best Practices
 
