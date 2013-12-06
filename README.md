@@ -126,7 +126,7 @@ to emit output to the dashboard. In particular, they allow the
 chunk of code.
 
 ```javascript
-
+ 
 // Display a string as plain text.
 engine.text(string)
 
@@ -135,7 +135,7 @@ engine.code(string, languageName)
 
 // Display an error message. If available, `details` can contain a stack 
 // trace or other multi-line information about the error.
-engine.error(message, details)
+engine.error(message, details )
 
 // Display a warning message.
 engine.warning(message, details)
