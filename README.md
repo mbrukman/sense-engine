@@ -135,7 +135,7 @@ engine.code(string, languageName)
 
 // Display an error message. If available, `details` can contain a stack 
 // trace or other multi-line information about the error.
-engine.error(message, details )
+engine.error(message, details)
 
 // Display a warning message.
 engine.warning(message, details)
@@ -164,6 +164,9 @@ engine.image({
   title
 })
 
+// Display simple HTML outside an IFrame.
+engine.html(html)
+
 // Display arbitrary HTML in an IFrame. Provide src or srcdoc,
 // not both.
 engine.iframe({
@@ -174,7 +177,7 @@ engine.iframe({
 })
 ```
 
-IFrame output can include arbitrary HTML, including JavaScript.
+IFrame output can include arbitrary HTML, including JavaScript. Simple HTML output must pass [AngularJS' $sanitize function](http://docs.angularjs.org/api/ngSanitize.$sanitize).
 
 ### Best Practices
 
