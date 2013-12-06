@@ -26,7 +26,7 @@ standard interface and isolated installation mechanism for engines.  If you're
 familiar with NodeJS, writing an engine for Sense should be simple.
 
 Engines implement a basic Engine API and include a `sense` entry in the
-modules `package.json` file. Full details are below.  The `examples` folder includes
+module's `package.json` file. Full details are below.  The `examples` folder includes
 an echo engine to get you started. For a more complete example, see Sense's
 [JavaScript](http://github.com/SensePlatform/sense-js-engine) engine.
 
