@@ -95,7 +95,7 @@ exports.createEngine = function() {
   engine.chunk = function(code, cb) {
     // Chunk code into pieces that can be executed in order.
     //
-    // The chunker function that takes a string of code
+    // The chunker is a function that takes a string of code
     // and passes to a callback an array of strings, where each element is a 
     // complete statement, block comment, or other complete code unit. These 
     // chunks will be sent to dashboard.execute one at a time.
