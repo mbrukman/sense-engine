@@ -32,7 +32,7 @@ an echo engine to get you started. For a more complete example, see Sense's
 
 ## Installing a New Engine
 
-Installing a new engine in Sense is just like installing a NPM package. Run
+Installing a new engine in Sense is just like installing an NPM package. Run
 
 ```
 npm install new-engine-name
@@ -52,7 +52,7 @@ is designed for stable and reproducible deployment.
 
 Engines are modules that export a `createEngine` function that returns an engine
 implementation.  When you launch a dashboard, this engine function will be called
-and hook the engine into Sense's entire cloud infastructure.  You can then
+and the engine will hook into Sense's entire cloud infastructure.  You can then
 interact with the engine the same way you do with Sense's built in engines: interactively
 in a dashboard, through an [exported job](http://help.senseplatform.com/getting-started#jobs), 
 or via Sense's [REST API](http://help.senseplatform.com/api/rest).
