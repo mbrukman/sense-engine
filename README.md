@@ -10,7 +10,7 @@ or cluster computing framework like  [Spark](http://spark.incubator.apache.org/)
 
 This module gives you everything you need to build a Sense engine for your favorite programming language
 or interactive  data analysis tool. By building on Sense, you automatically get an interactive cloud
-user interface, scalable worker engines, shared project filestem, private project network, 
+user interface, scalable worker infrastructure, shared project filesystem, private project network, 
 interactive and job-based workflow, and powerful REST API.  Sense allows you to focus on 
 the core of your engine, while providing users a world class experience that 
 seamlessly integrates with their other tools.
@@ -21,9 +21,9 @@ We're just getting started.  If you're building an engine on Sense, drop us a li
 
 ## Writing a New Engine
 
-Sense uses [NodeJS](http://nodejs.org/) [NPM](https://npmjs.org/) modules as a
+Sense uses [Node.js](http://nodejs.org/) [NPM](https://npmjs.org/) modules as a
 standard interface and isolated installation mechanism for engines.  If you're
-familiar with NodeJS, writing an engine for Sense should be simple.
+familiar with Node.js, writing an engine for Sense should be simple.
 
 Engines implement a basic Engine API and include a `sense` entry in the
 module's `package.json` file. Full details are below.  The `examples` folder includes
@@ -52,7 +52,7 @@ is designed for stable and reproducible deployment.
 
 Engines are modules that export a `createEngine` function that returns an engine
 implementation.  When you launch a dashboard, this engine function will be called
-and the engine will hook into Sense's entire cloud infastructure.  You can then
+and the engine will hook into Sense's entire cloud infrastructure.  You can then
 interact with the engine the same way you do with Sense's built in engines: interactively
 in a dashboard, through an [exported job](http://help.senseplatform.com/getting-started#jobs), 
 or via Sense's [REST API](http://help.senseplatform.com/api/rest).
@@ -167,17 +167,15 @@ engine.image({
 // Display simple HTML outside an IFrame.
 engine.html(html)
 
-// Display arbitrary HTML in an IFrame. Provide src or srcdoc,
-// not both.
+// Display arbitrary HTML in an IFrame.
 engine.iframe({
   src,
-  srcdoc,
   width,
   height
 })
 ```
 
-IFrame output can include arbitrary HTML, including JavaScript. Simple HTML output must pass [AngularJS' $sanitize function](http://docs.angularjs.org/api/ngSanitize.$sanitize).
+IFrame output can include arbitrary HTML, including JavaScript. Simple HTML output should pass AngularJS's [$sanitize](http://docs.angularjs.org/api/ngSanitize.$sanitize) function.
 
 ### Best Practices
 
