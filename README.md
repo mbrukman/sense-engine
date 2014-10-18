@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/SensePlatform/sense-engine.png)](https://travis-ci.org/SensePlatform/sense-engine)
 
-[Sense](https://senseplatform.com) is a collaborative cloud platform for data science that makes
+[Sense](https://sense.io) is a collaborative cloud platform for data science that makes
 it radically easier to build, scale, and deploy data analysis and big data analytics projects, 
 regardless of the  tools you use.  Sense has built in support for R, Python, and JavaScript,
 but can be extended to any interactive tool such as a new language like [Julia](http://julialang.org/)
@@ -54,8 +54,8 @@ Engines are modules that export a `createEngine` function that returns an engine
 implementation.  When you launch a dashboard, this engine function will be called
 and the engine will hook into Sense's entire cloud infrastructure.  You can then
 interact with the engine the same way you do with Sense's built in engines: interactively
-in a dashboard, through an [exported job](http://help.senseplatform.com/getting-started#jobs), 
-or via Sense's [REST API](http://help.senseplatform.com/api/rest).
+in a dashboard, through an [exported job](http://help.sense.io/getting-started#jobs), 
+or via Sense's [REST API](http://help.sense.io/api/rest).
 
 ### Basic Engine Implementation
 
@@ -255,7 +255,7 @@ to [sequence asynchronous tests](http://visionmedia.github.io/mocha/#asynchronou
 
 Thanks for helping make Sense awesome.  Need help?  Get in touch.
 
-* Email: support@senseplatform.com
+* Email: support@sense.io
 * Twitter: https://twitter.com/SensePlatform
 * Google Group: https://groups.google.com/forum/?fromgroups#!forum/sense-users
 * IRC: `#senseplatform` on `irc.freenode.net`

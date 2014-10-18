@@ -3,7 +3,7 @@
   "description": "Data Science Engine API for Sense.",
   "version": "0.3.6",
   "main": "./lib/index.js",
-  "url": "https://senseplatform.com/",
+  "url": "https://sense.io/",
   "repository": "https://github.com/SensePlatform/sense-engine",
   "license": "MIT",
   "author": "Sense Inc",
