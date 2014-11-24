@@ -107,6 +107,23 @@ exports.createEngine = function() {
     cb(code.split('\n'));
   };
 
+  engine.complete = function(input, cursorPos) {
+    // Autocompletes the given partial input in response to tab.
+    // Should eventually trigger a call to engine.completion().
+
+    // The callback should be called with the token under the cursor and the 
+    // completion options for it. The token should be an object with 'start',
+    // and 'end' attributes, such that the content of the token under the cursor
+    // is input.slice(start, end). The completions should be an array of strings.
+
+    cb({
+      token: {start: 0, end: 2}
+      completions: [
+        "axes", "axis", axial", "axiom", "axisymmetry"
+      ]
+    });
+  };
+
   // Call engine.ready() when the dashboard is first ready to 
   // take input. You can call ready from a callback if you need to wait for
   // some event in a worker process.
