@@ -1,7 +1,5 @@
 # Sense Engine API
 
-[![Build Status](https://travis-ci.org/SensePlatform/sense-engine.png)](https://travis-ci.org/SensePlatform/sense-engine)
-
 [Sense](https://sense.io) is a collaborative cloud platform for data science that makes
 it radically easier to build, scale, and deploy data analysis and big data analytics projects, 
 regardless of the  tools you use.  Sense has built in support for R, Python, and JavaScript,
@@ -22,31 +20,11 @@ We're just getting started.  If you're building an engine on Sense, drop us a li
 ## Writing a New Engine
 
 Sense uses [Node.js](http://nodejs.org/) [NPM](https://npmjs.org/) modules as a
-standard interface and isolated installation mechanism for engines.  If you're
-familiar with Node.js, writing an engine for Sense should be simple.
+standard interface for engines.  If you're familiar with Node.js, writing an 
+engine for Sense should be simple.
 
-Engines implement a basic Engine API and include a `sense` entry in the
-module's `package.json` file. Full details are below.  The `examples` folder includes
-an echo engine to get you started. For a more complete example, see Sense's
-[JavaScript](http://github.com/SensePlatform/sense-js-engine) engine.
-
-## Installing a New Engine
-
-Installing a new engine in Sense is just like installing an NPM package. Run
-
-```
-npm install new-engine-name
-```
-
-in one of your projects. This will install the engine locally in the project's `/home/sense/node_modules`
-folder. When you launch a new dashboard from that project in the future, the installed engine 
-will appear automatically in the engine list.
-
-![Engine List](https://sense.global.ssl.fastly.net/assets/c48e701f-screenshot-new.png)
-
-Since engines are installed locally, you can be confident that your project will always
-work even if you use a different version of the engine on a different project.  Sense
-is designed for stable and reproducible deployment.
+The `examples` folder includes an echo engine to get you started. For a more 
+complete example, see Sense's [JavaScript](http://github.com/SensePlatform/sense-js-engine) engine.
 
 ## Engine API
 
@@ -257,8 +235,6 @@ Thanks for helping make Sense awesome.  Need help?  Get in touch.
 
 * Email: support@sense.io
 * Twitter: https://twitter.com/SensePlatform
-* Google Group: https://groups.google.com/forum/?fromgroups#!forum/sense-users
-* IRC: `#senseplatform` on `irc.freenode.net`
 
 ## LICENSE
 
